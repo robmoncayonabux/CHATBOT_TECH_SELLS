@@ -5,21 +5,21 @@ const MockAdapter = require('@bot-whatsapp/database/mock')
 
 const REGEX_CREDIT_NUMBER = require('./events/creditCard')
 const REGEX_EMAIL = require('./events/email')
-const KeyShaggy = require ('./events/shaggy.js')
 
 
-const flowAccion = addKeyword(EVENTS.ACTION).addAnswer('Me estas arrojando una accion... que tiro?')
+
 const flowDocumento = addKeyword(EVENTS.DOCUMENT).addAnswer('Para que este documento?')
+
 const flowMedia = addKeyword(EVENTS.MEDIA).addAnswer('Y que quieres que haga con este archivo media?')
+
 const flowVoiceNote = addKeyword(EVENTS.VOICE_NOTE).addAnswer('Interesante... me has dado un voicenote')
+
 const flowTarjetaDeCredito =addKeyword(REGEX_CREDIT_NUMBER.toString(), { regex: true }).addAnswer('Guau una tarjeta de credito')
+
 const flowEmail =addKeyword(REGEX_EMAIL.toString(), { regex: true }).addAnswer('Si, si ya te envio un correo..')
 
 const flowShaggy = 
-addKeyword(KeyShaggy,
-{
-    sensitive: false
-})
+addKeyword("shaggy")
 .addAnswer("Zoinks", 
 {
     media: "https://media.tenor.com/oY2wYWw2y6MAAAAC/shaggy-scared.gif"
@@ -30,17 +30,17 @@ addKeyword(KeyShaggy,
 })
 
 
-const flowSaludo = addKeyword(EVENTS.WELCOME).addAnswer(
+const flowPrincipal = addKeyword(EVENTS.WELCOME).addAnswer(
     'Hola Bienvenido a mi testeo de ChatBOT, enviame algo o dime *Shaggy*',
     null,
     null,
-    [ flowEmail, flowAccion, flowShaggy, flowTarjetaDeCredito, flowDocumento, flowVoiceNote, flowMedia ],
+    [ flowDocumento, flowEmail, flowMedia, flowShaggy, flowTarjetaDeCredito, flowVoiceNote]
     )
 
 
 const main = async () => {
     const adapterDB = new MockAdapter()
-    const adapterFlow = createFlow([flowSaludo])
+    const adapterFlow = createFlow([flowPrincipal])
     const adapterProvider = createProvider(BaileysProvider)
 
     createBot({

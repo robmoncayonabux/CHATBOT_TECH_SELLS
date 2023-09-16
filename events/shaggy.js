@@ -1,8 +1,7 @@
 
-const shaggy = "shaggy";
-const KeyShaggy = (sentence, keywords) => {
 
-  const lowerCaseSentence = sentence.toLowerCase();
+const KeyShaggy = (keywords) => {
+
 
   for (const shaggy of keywords) {
     if (lowerCaseSentence.includes(keywords)) {
@@ -13,4 +12,4 @@ const KeyShaggy = (sentence, keywords) => {
   return false
 };
 
-module.export = {  shaggy, KeyShaggy };
+module.export = { KeyShaggy };
