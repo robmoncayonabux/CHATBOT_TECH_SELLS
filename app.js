@@ -12,14 +12,14 @@ const flowDocumento = addKeyword(EVENTS.DOCUMENT).addAnswer('Para que este docum
 
 const flowMedia = addKeyword(EVENTS.MEDIA).addAnswer('Y que quieres que haga con este archivo media?')
 
-const flowVoiceNote = addKeyword(EVENTS.VOICE_NOTE).addAnswer('Interesante... me has dado un voicenote')
+const flowVoiceNote = addKeyword('Te enviare un voicenote', EVENTS.VOICE_NOTE).addAnswer('Interesante... me has dado un voicenote')
 
 const flowTarjetaDeCredito =addKeyword(REGEX_CREDIT_NUMBER.toString(), { regex: true }).addAnswer('Guau una tarjeta de credito')
 
 const flowEmail =addKeyword(REGEX_EMAIL.toString(), { regex: true }).addAnswer('Si, si ya te envio un correo..')
 
 const flowShaggy = 
-addKeyword("shaggy")
+addKeyword('Shaggy ¯\_(ツ)_/¯')
 .addAnswer("Zoinks", 
 {
     media: "https://media.tenor.com/oY2wYWw2y6MAAAAC/shaggy-scared.gif"
@@ -30,17 +30,38 @@ addKeyword("shaggy")
 })
 
 
-const flowPrincipal = addKeyword(EVENTS.WELCOME).addAnswer(
-    'Hola Bienvenido a mi testeo de ChatBOT, enviame algo o dime *Shaggy*',
-    null,
-    null,
-    [ flowDocumento, flowEmail, flowMedia, flowShaggy, flowTarjetaDeCredito, flowVoiceNote]
+const flowPrincipal = addKeyword(EVENTS.WELCOME)
+.addAnswer(['Hola Bienvenido a mi testeo de ChatBOT, elige la opcion que me vas a enviar:'],
+    {
+        buttons:[
+            {
+                body: 'Shaggy ¯\_(ツ)_/¯',
+                body: 'Te enviare un voicenote',
+                body: 'Te enviare mi correo',
+            }
+        ]
+    },
+    {capture: true},
+    async (ctx, {fallBack}) => {
+        if (![ 
+            'Shaggy ¯\_(ツ)_/¯',
+            'Te enviare un voicenote',
+            'Te enviare mi correo'].includes(ctx.body)){
+                return fallBack()
+            } 
+            const flowFinal = addKeyword(ctx.body).addAnswer(
+            [flowDocumento, flowEmail, flowMedia, flowShaggy, flowTarjetaDeCredito, flowVoiceNote]
+         )
+         return flowFinal
+        }
+
     )
+
 
 
 const main = async () => {
     const adapterDB = new MockAdapter()
-    const adapterFlow = createFlow([flowPrincipal])
+    const adapterFlow = createFlow([ flowPrincipal, flowDocumento, flowEmail, flowMedia, flowShaggy, flowTarjetaDeCredito, flowVoiceNote])
     const adapterProvider = createProvider(BaileysProvider)
 
     createBot({

@@ -15,7 +15,7 @@
         "@bot-whatsapp/portal": "latest",
         "@bot-whatsapp/provider": "latest",
         "@whiskeysockets/baileys": "^6.4.0",
-        
+        "axios": "^1.5.0",
         "wa-sticker-formatter": "4.3.2"
     },
     "author": "",
