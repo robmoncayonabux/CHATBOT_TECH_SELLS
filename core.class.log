@@ -2,66 +2,71 @@
   key: {
     remoteJid: '593998340827@s.whatsapp.net',
     fromMe: false,
-    id: '1B5FEE4ACFE707E0DB',
+    id: '853D2993563F12734FE8EC8E99067FEC',
     participant: undefined
   },
-  messageTimestamp: 1694904551,
+  messageTimestamp: 1695065565,
   pushName: 'Roberto Moncayo',
   broadcast: false,
   message: Message {
-    extendedTextMessage: ExtendedTextMessage { text: 'hopla', contextInfo: [ContextInfo] },
+    conversation: 'Hola',
     messageContextInfo: MessageContextInfo {
       deviceListMetadata: [DeviceListMetadata],
       deviceListMetadataVersion: 2
     }
   },
-  body: 'hopla',
+  body: 'Hola',
   from: '593998340827'
 }
 [QUEUE_SE_ENVIO]:  {
-  ref: 'ans_aeb7d154-27ed-4af9-9af1-5e796cf28857',
-  keyword: 'key_5ed3920d-6fe9-4a26-a5e2-d5acfc46e928',
-  answer: 'Hola Bienvenido a mi testeo de ChatBOT, enviame algo o dime *Shaggy*',
+  ref: 'ans_019c47db-c541-42b9-b965-e0e53ccce215',
+  keyword: 'key_2e75eab4-e10c-4c34-b65b-70a79a7cb7d1',
+  answer: 'Escribe Precio',
   options: {
     media: null,
     buttons: [],
-    capture: true,
+    capture: false,
     child: null,
     delay: 0,
-    nested: [
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object], [Object],
-      [Object]
-    ],
+    nested: [ [Object], [Object] ],
     keyword: {},
-    callback: true
+    callback: false
   },
-  refSerialize: '402bfde012cedf5fab6d6802c1edc0c4'
+  refSerialize: '3255db36f3e01b81bf400418c4eec015'
 }
 [handleMsg]:  {
   key: {
     remoteJid: '593998340827@s.whatsapp.net',
     fromMe: false,
-    id: 'F2134B744FCAC1B645',
+    id: 'F5F2AA9E004BB75A0625FF379D2A6E02',
     participant: undefined
   },
-  messageTimestamp: 1694904553,
+  messageTimestamp: 1695065567,
   pushName: 'Roberto Moncayo',
   broadcast: false,
   message: Message {
-    extendedTextMessage: ExtendedTextMessage {
-      text: 'jkdnfajklsnfsa',
-      contextInfo: [ContextInfo]
-    },
+    conversation: 'Precio',
     messageContextInfo: MessageContextInfo {
       deviceListMetadata: [DeviceListMetadata],
       deviceListMetadataVersion: 2
     }
   },
-  body: 'jkdnfajklsnfsa',
+  body: 'Precio',
   from: '593998340827'
+}
+[QUEUE_SE_ENVIO]:  {
+  ref: 'ans_36c5af7a-0afd-487f-81c7-65bb14cb3b2c',
+  keyword: 'key_df1d994e-eab5-4101-9d14-0ff091a7e63b',
+  answer: 'Consultando en la base de datos...',
+  options: {
+    media: null,
+    buttons: [],
+    capture: false,
+    child: null,
+    delay: 0,
+    nested: [],
+    keyword: {},
+    callback: true
+  },
+  refSerialize: '9ab5babcc0278890ad21c07ed3791a5b'
 }
