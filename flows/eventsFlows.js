@@ -1,7 +1,7 @@
 const { addKeyword, EVENTS } = require('@bot-whatsapp/bot')
 
-const REGEX_CREDIT_NUMBER = require('./events/creditCard')
-const REGEX_EMAIL = require('./events/email')
+const REGEX_CREDIT_NUMBER = require('./utils/regexCreditCard')
+const REGEX_EMAIL = require('./utils/email')
 
 
 

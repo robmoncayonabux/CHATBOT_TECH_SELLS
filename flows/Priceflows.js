@@ -14,7 +14,6 @@ const flowPrecio = addKeyword('Precio').addAnswer(
     const respuesta = await axios(API);
 
     for (const item of respuesta.data) {
-      console.log(item)
       if (contador > 3) break;
       contador++;
       flowDynamic({ body: [item.title, ` precio: ${item.price}`], media: item.image })

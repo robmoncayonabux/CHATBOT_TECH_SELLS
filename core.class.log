@@ -2,10 +2,10 @@
   key: {
     remoteJid: '593998340827@s.whatsapp.net',
     fromMe: false,
-    id: 'B47195FF6491EEA9A6D31E045F1C3B73',
+    id: '119CAFDF6273DDE11BEEE3351681A432',
     participant: undefined
   },
-  messageTimestamp: 1695082356,
+  messageTimestamp: 1695146196,
   pushName: 'Roberto Moncayo',
   broadcast: false,
   message: Message {
@@ -19,9 +19,9 @@
   from: '593998340827'
 }
 [QUEUE_SE_ENVIO]:  {
-  ref: 'ans_60bae6f2-6abe-4743-8d0f-688c6fbc3c4e',
-  keyword: 'key_3087da8a-7d0a-420c-872d-7e8cef2b2da6',
-  answer: 'Hola bienvenido hermano',
+  ref: 'ans_6b2421cd-4982-4b28-958f-00e554602cc1',
+  keyword: 'key_a8e6028c-198e-479b-8db4-0e66c2bd6a10',
+  answer: 'Hola hermano, BIENVENIDO',
   options: {
     media: null,
     buttons: [],
@@ -32,28 +32,28 @@
     keyword: {},
     callback: false
   },
-  refSerialize: '9958636b2dbd6f0ec01359ad9a57305c'
+  refSerialize: 'd25696e7b5f01364c9016b957732284b'
 }
 [QUEUE_SE_ENVIO]:  {
-  ref: 'ans_e87ab83f-bf41-470b-b8fc-ff6469982b2d',
-  keyword: 'ans_60bae6f2-6abe-4743-8d0f-688c6fbc3c4e',
-  answer: 'Ya vamos a comenzar con tu pedido... necesitamos la siguiente info',
+  ref: 'ans_0afe75a4-7cbc-4c14-9982-7c381e2fd3bb',
+  keyword: 'ans_6b2421cd-4982-4b28-958f-00e554602cc1',
+  answer: 'Ya vamos a comenzar con tu pedido... Revisando base de datos.... ⌚👀',
   options: {
     media: null,
     buttons: [],
     capture: false,
     child: null,
-    delay: 0,
+    delay: 700,
     nested: [],
     keyword: {},
     callback: false
   },
-  refSerialize: '94327daf7bc14d92d28c9f9aecd0bde1'
+  refSerialize: 'abf502565148b7f899b92ed9e235086f'
 }
 [QUEUE_SE_ENVIO]:  {
-  ref: 'ans_95f5c2df-166f-4573-a13a-64a3d04764fc',
-  keyword: 'ans_e87ab83f-bf41-470b-b8fc-ff6469982b2d',
-  answer: 'Cual es tu nombre?',
+  ref: 'ans_97960357-e5c5-420d-91a1-f63c8155242d',
+  keyword: 'ans_0afe75a4-7cbc-4c14-9982-7c381e2fd3bb',
+  answer: 'Nombre?',
   options: {
     media: null,
     buttons: [],
@@ -64,16 +64,16 @@
     keyword: {},
     callback: true
   },
-  refSerialize: 'dea7f8cb8bedd10acdc08696efb7a5de'
+  refSerialize: '6e52bf7fa10dda6c95931b0d29d436b7'
 }
 [handleMsg]:  {
   key: {
     remoteJid: '593998340827@s.whatsapp.net',
     fromMe: false,
-    id: '5C83DDC20D374E5EC6816A780D7ED125',
+    id: 'B6692DC3CDD1E78FC51DB8AF2AC0ED0A',
     participant: undefined
   },
-  messageTimestamp: 1695082360,
+  messageTimestamp: 1695146201,
   pushName: 'Roberto Moncayo',
   broadcast: false,
   message: Message {
@@ -87,8 +87,8 @@
   from: '593998340827'
 }
 [QUEUE_SE_ENVIO]:  {
-  ref: 'ans_685f9d89-4039-4a15-86c5-703d928a610d',
-  keyword: 'ans_95f5c2df-166f-4573-a13a-64a3d04764fc',
+  ref: 'ans_3dd447a4-c1c3-419f-ba3a-b0f9e5838d4d',
+  keyword: 'ans_97960357-e5c5-420d-91a1-f63c8155242d',
   answer: 'Cual es tu direccion?',
   options: {
     media: null,
@@ -100,77 +100,5 @@
     keyword: {},
     callback: true
   },
-  refSerialize: 'b175f757c59b81664bfaebe9c7d7da3f'
-}
-[handleMsg]:  {
-  key: {
-    remoteJid: '593998340827@s.whatsapp.net',
-    fromMe: false,
-    id: '473F1315AA9CC48E0B76D2562CEC51A9',
-    participant: undefined
-  },
-  messageTimestamp: 1695082363,
-  pushName: 'Roberto Moncayo',
-  broadcast: false,
-  message: Message {
-    conversation: 'Samanes',
-    messageContextInfo: MessageContextInfo {
-      deviceListMetadata: [DeviceListMetadata],
-      deviceListMetadataVersion: 2
-    }
-  },
-  body: 'Samanes',
-  from: '593998340827'
-}
-[QUEUE_SE_ENVIO]:  {
-  ref: 'ans_914305d0-fcd7-4902-a49e-3c2de707fd64',
-  keyword: 'ans_685f9d89-4039-4a15-86c5-703d928a610d',
-  answer: 'Tienes algun codigo?',
-  options: {
-    media: null,
-    buttons: [ [Object], [Object] ],
-    capture: true,
-    child: null,
-    delay: 0,
-    nested: [],
-    keyword: {},
-    callback: true
-  },
-  refSerialize: '703158b1ebae60d649c977e92821a270'
-}
-[handleMsg]:  {
-  key: {
-    remoteJid: '593998340827@s.whatsapp.net',
-    fromMe: false,
-    id: '8B81B83ECAFA22498C15A8033313EACE',
-    participant: undefined
-  },
-  messageTimestamp: 1695082369,
-  pushName: 'Roberto Moncayo',
-  broadcast: false,
-  message: Message {
-    conversation: 'Que paso',
-    messageContextInfo: MessageContextInfo {
-      deviceListMetadata: [DeviceListMetadata],
-      deviceListMetadataVersion: 2
-    }
-  },
-  body: 'Que paso',
-  from: '593998340827'
-}
-[QUEUE_SE_ENVIO]:  {
-  ref: 'ans_c52dd48b-229b-4f9b-b35a-fee7242e90b5',
-  keyword: 'ans_914305d0-fcd7-4902-a49e-3c2de707fd64',
-  answer: 'Procesando tu pedido...',
-  options: {
-    media: null,
-    buttons: [],
-    capture: false,
-    child: null,
-    delay: 0,
-    nested: [],
-    keyword: {},
-    callback: true
-  },
-  refSerialize: 'c0459cf54bd0ededbb3b46a0f4a593f2'
+  refSerialize: '7f689f9b963642dfa804d9144eb01140'
 }

@@ -1,20 +1,21 @@
-const { addKeyword, createBot, createProvider, createFlow} = require('@bot-whatsapp/bot')
+const { addKeyword, createBot, createProvider, createFlow, EVENTS} = require('@bot-whatsapp/bot')
 
 const QRPortalWeb = require('@bot-whatsapp/portal')
 const BaileysProvider = require('@bot-whatsapp/provider/baileys')
 const MockAdapter = require('@bot-whatsapp/database/mock')
 
-const flowPrecio = require('./flows/flows')
-const ticketsSave = require('./ticket/ticket')
+const flowPrecio = require('./flows/Priceflows')
+const ticketsSave = require('./services/ticketServices')
 
 let GLOBLAL_STATE = {};
 
-const flowPrincipal = addKeyword("Hola")
-  .addAnswer("Hola bienvenido hermano")
+const flowPrincipal = addKeyword(EVENTS.WELCOME)
+  .addAnswer("Hola hermano, BIENVENIDO")
   .addAnswer(
-    "Ya vamos a comenzar con tu pedido... necesitamos la siguiente info"
-  )
-  .addAnswer("Cual es tu nombre?", { capture: true }, async (ctx) => {
+    "Ya vamos a comenzar con tu pedido... Revisando base de datos.... ⌚👀",
+    { delay: 700 } )
+  .addAnswer("Nombre?", { capture: true }, async (ctx) => {
+    console.log("Info", ctx);
     GLOBLAL_STATE[ctx.from] = {
       name: ctx.body,
       description: "",
@@ -24,14 +25,10 @@ const flowPrincipal = addKeyword("Hola")
     console.log("Este numero escribio", ctx.from);
     GLOBLAL_STATE[ctx.from].direction = ctx.body;
   })
-  .addAnswer(
-    "Tienes algun codigo?",
-    { capture: true },
-    async (ctx) => {
-      GLOBLAL_STATE[ctx.from].promotion = ctx.body;
-      console.log("Esta info es la que se recolecto", GLOBLAL_STATE[ctx.from]);
-    }
-  )
+  .addAnswer("Tienes algun codigo?", { capture: true }, async (ctx) => {
+    GLOBLAL_STATE[ctx.from].promotion = ctx.body;
+    console.log("Esta info es la que se recolecto", GLOBLAL_STATE[ctx.from]);
+  })
   .addAnswer("Procesando tu pedido...", null, async (ctx, { flowDynamic }) => {
     const ticketAnswer = await ticketsSave(GLOBLAL_STATE[ctx.from]);
     await flowDynamic(`TU ORDEN/TICKET ES EL # ${ticketAnswer.data.data.id}`);
