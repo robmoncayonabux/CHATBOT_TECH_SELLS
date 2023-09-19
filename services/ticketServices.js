@@ -1,7 +1,7 @@
 const axios = require("axios");
 require('dotenv').config();
 
-const API_TOKEN = process.env.API_TOKEN;
+const API_TOKEN = process.env.API_TOKEN_DB;
 
 const ticketsSave = async (datosEntrantes) => {
   const options = {

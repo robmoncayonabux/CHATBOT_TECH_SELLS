@@ -26,5 +26,5 @@ const clientCheck = async (datosEntrantes) => {
   }
 };
 
-module.exports = ticketsSave;
+module.exports = clientCheck;
 
