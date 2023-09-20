@@ -2,10 +2,8 @@ import('node-fetch').then(fetch => {
   global.fetch = fetch.default;
 });
 
-require('dotenv').config()
-
 const { CoreClass } = require('@bot-whatsapp/bot');
-
+require('dotenv').config()
 
 
 
