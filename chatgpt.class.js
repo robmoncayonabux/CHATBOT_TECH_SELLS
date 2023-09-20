@@ -2,18 +2,14 @@ import('node-fetch').then(fetch => {
   global.fetch = fetch.default;
 });
 
-const { CoreClass } = require('@bot-whatsapp/bot');
 require('dotenv').config()
 
-
-
-class ChatGPTClass extends CoreClass {
+class ChatGPTClass {
   queue = []; 
   optionsGPT = { model: "gpt-3.5-turbo-0301" };
   openai = undefined;
 
-  constructor(_database, _provider) {
-    super(null, _database, _provider)
+  constructor() {
     this.init().then();
   }
 
@@ -29,24 +25,24 @@ class ChatGPTClass extends CoreClass {
     );
   };
 
-  handleMsg = async (ctx) => {
-    const {from, body} = ctx
+  /**
+   * Manejador de los mensajes
+   * sun funcion es enviar un mensaje a wahtsapp
+   * @param {*} ctx 
+   */
+  handleMsgChatGPT = async (body) => {
     const interaccionChatGPT = await this.openai.sendMessage(body, {
-        conversationId: !this.queue.length
-          ? undefined
-          : this.queue[this.queue.length - 1].conversationId,
-        parentMessageId: !this.queue.length
-          ? undefined
-          : this.queue[this.queue.length - 1].id,
-      });
-    this.queue.push(interaccionChatGPT);
-    const parseMessage = {
-        ...interaccionChatGPT,
-        answer: interaccionChatGPT.text
-    }
+      conversationId: !this.queue.length
+        ? undefined
+        : this.queue[this.queue.length - 1].conversationId,
+      parentMessageId: !this.queue.length
+        ? undefined
+        : this.queue[this.queue.length - 1].id,
+    });
 
-    this.sendFlowSimple([parseMessage], from)
-  }
+    this.queue.push(interaccionChatGPT);
+    return interaccionChatGPT
+  };
 }
 
 module.exports = ChatGPTClass;
