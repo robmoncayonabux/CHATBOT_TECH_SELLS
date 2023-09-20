@@ -23,9 +23,7 @@ const flowInicial = addKeyword("Hola")
     null,
     async () => {
       try {
-        console.log('Inicie el agarre de PROMPT', PROMPT)
         await ChatGPTInstance.handleMsgChatGPT(PROMPT);
-        console.log(`Imprimi el PROMPT, ${PROMPT}`)
       } catch (error) {
         console.log(error)
       }
@@ -35,7 +33,6 @@ const flowInicial = addKeyword("Hola")
     "Solicita una cita con el Doctor Don Pepe! 👨‍⚕️",
     { capture: true },
     async (ctx, { flowDynamic, fallBack }) => {
-      console.log('llegue a enviar el PROMP')
       const response = await ChatGPTInstance.handleMsgChatGPT(ctx.body);
       const message = response.text;
       if (ctx.body.toString() !== "SI CONFIRMO") {
