@@ -11,9 +11,11 @@
     "dependencies": {
         "@bot-whatsapp/bot": "latest",
         "@bot-whatsapp/cli": "latest",
+        "@bot-whatsapp/contexts": "^0.1.32",
         "@bot-whatsapp/database": "latest",
         "@bot-whatsapp/portal": "latest",
         "@bot-whatsapp/provider": "latest",
+        "@google-cloud/dialogflow-cx": "^4.1.0",
         "@whiskeysockets/baileys": "^6.4.0",
         "axios": "^1.5.0",
         "chatgpt": "^5.2.5",

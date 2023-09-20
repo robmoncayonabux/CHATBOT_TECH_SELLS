@@ -1,8 +1,11 @@
 .env
 node_modules/
-bot_sessions/
-core.class.log
-queue.class.log
+*_sessions/
+*.log
+*.png
+google-key.json
+google-key.json:Zone.Identifier
+
 # Created by https://www.toptal.com/developers/gitignore/api/windows,linux,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,linux,macos
 

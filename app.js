@@ -8,11 +8,24 @@ const MockAdapter = require('@bot-whatsapp/database/mock')
 
 const PROMPT = require('./promp.js')
 
-
 const ChatGPTInstance = new ChatGPTClass()
+
+let swith = false;
 
 const flowConfirmacion = addKeyword('SI CONFIRMO').addAnswer('Su cita a sido programada!')
 
+const flowReserva = addKeyword('reserva')
+.addAction(async(ctx, {flowDynamic, ednFlow}) =>{
+  if(!swith){
+    await flowDynamic('Estamos cerrados vuelva mañana')
+    await ednFlow()
+  }
+})
+.addAnswer('Continuamos con tu reserva...')
+
+
+const flowOn = addKeyword('prender').addAction(() => swith = true).addAnswer('Me encendi');
+const flowOff = addKeyword('apagar').addAction(()=> swith = false).addAnswer('Me apague')
 
 const flowInicial = addKeyword("Hola")
   .addAnswer(
@@ -45,7 +58,7 @@ const flowInicial = addKeyword("Hola")
 
   const main = async () => {
     const adapterDB = new MockAdapter();
-    const adapterFlow = createFlow([flowInicial])
+    const adapterFlow = createFlow([flowInicial, flowOff, flowOn, flowReserva])
     const adapterProvider = createProvider(BaileysProvider);
     
     
