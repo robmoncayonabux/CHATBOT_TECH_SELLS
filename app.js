@@ -1,5 +1,5 @@
 
-const { addKeyword, createBot, createProvider, createFlow, EVENTS} = require('@bot-whatsapp/bot')
+const { addKeyword, createBot, createProvider, createFlow} = require('@bot-whatsapp/bot')
 const ChatGPTClass = require('./chatgpt.class.js')
 
 const QRPortalWeb = require('@bot-whatsapp/portal')
