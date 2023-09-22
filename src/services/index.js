@@ -26,12 +26,12 @@ class GoogleSheetService {
   // Recuperar la lista de GoogleSheet
   async retriveStockList() {
     try {
-        const list = [];
+        const Stocklist = [];
         await this.doc.loadInfo();
-        const sheet = this.doc.sheetsByIndex[0];  // la primera hoja
+        const sheet = this.doc.sheetsByIndex[0]; //# de hoja del google sheet
         await sheet.loadCells("A1:H7");
         
-        for (let rowIndex = 1; rowIndex <= 5; rowIndex++) {  // Suponiendo que las filas de datos comienzan en la fila 2 (índice 1)
+        for (let rowIndex = 1; rowIndex <= 5; rowIndex++) {  
             const item = {
                 Item: sheet.getCell(rowIndex, 0).value,
                 Codigo: sheet.getCell(rowIndex, 1).value,
@@ -41,11 +41,39 @@ class GoogleSheetService {
                 Stock: sheet.getCell(rowIndex, 5).value,
                 Precio: sheet.getCell(rowIndex, 6).value
             };
-            list.push(item);
+            Stocklist.push(item);
+            console.log(item); 
+        }
+        
+        return Stocklist;
+    } catch (err) {
+        console.log(err);
+        return undefined;
+    }
+}
+  async retrive3DList() {
+    try {
+        const list3d = [];
+        await this.doc.loadInfo();
+        const sheet = this.doc.sheetsByIndex[1];  
+        await sheet.loadCells("A1:H20");
+        
+        for (let rowIndex = 1; rowIndex <= 5; rowIndex++) {  // Suponiendo que las filas de datos comienzan en la fila 2 (índice 1)
+            const item = {
+                fecha: sheet.getCell(rowIndex, 0).value,
+                codigo: sheet.getCell(rowIndex, 1).value,
+                link: sheet.getCell(rowIndex, 2).value,
+                altura: sheet.getCell(rowIndex, 3).value,
+                contenido: sheet.getCell(rowIndex, 4).value,
+                pintura: sheet.getCell(rowIndex, 5).value,
+                observaciones: sheet.getCell(rowIndex, 6).value,
+                proceso: sheet.getCell(rowIndex, 7).value
+            };
+            list3d.push(item);
             console.log(item);  // Imprimir cada item para verificar los valores
         }
         
-        return list;
+        return list3d;
     } catch (err) {
         console.log(err);
         return undefined;
