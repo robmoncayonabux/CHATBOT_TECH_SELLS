@@ -5,6 +5,8 @@ node_modules/
 *.png
 google-key.json
 google-key.json:Zone.Identifier
+baileys.log
+prompt.js
 
 # Created by https://www.toptal.com/developers/gitignore/api/windows,linux,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,linux,macos
