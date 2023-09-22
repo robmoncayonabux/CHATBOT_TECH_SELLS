@@ -1,11 +1,11 @@
-
 const { createBot, createProvider, createFlow} = require('@bot-whatsapp/bot')
 
 const BaileysProvider = require('@bot-whatsapp/provider/baileys')
 const QRPortalWeb = require('@bot-whatsapp/portal')
 const MockAdapter = require('@bot-whatsapp/database/mock')
 
-const welcomeFlow = require('./src/flow/welcomeFlow')
+const welcomeFlow = require('./src/flows/welcomeFlow')
+
 
 
   const main = async () => {
