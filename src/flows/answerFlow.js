@@ -26,18 +26,26 @@ const flowVenta = addKeyword("1").addAnswer(
 
 
 const flowPedidos3D = addKeyword("2").addAnswer(
+  [
   "Encantado de mostrarte como va el pedido de las impresiones 3D!",
-  null,
-  async (_, { flowDynamic }) => {
+  "",
+  "Cual es tu numero de pedido? ✌🏻😎"
+],
+  {capture: true},
+  async (ctx, { flowDynamic, fallBack }) => {
+    const targetCode = ctx.body
     try{
-    const getList = await googleSheet.retrive3DList();
-    for (const stockList3d of getList) {
-      GLOBAL_STATE.push(stockList3d);
-      await flowDynamic(stockList3d);
-    }
+    const getProduct = await googleSheet.retrive3DList(targetCode);
+    if(getProduct===null){
+      fallBack()
+    } 
+    return getProduct
+    console.log(getProduct)
   }
   catch(error){
     console.log(error)
   }
 });
-module.exports = flowPedidos3D;
+
+module.exports = flowVenta 
+module.exports = flowPedidos3D 
