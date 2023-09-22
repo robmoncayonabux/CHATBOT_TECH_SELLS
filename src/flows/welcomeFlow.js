@@ -1,6 +1,7 @@
 const { addKeyword, EVENTS } = require("@bot-whatsapp/bot");
 
-const flowVenta = require ('./answerFlow')
+const flowVenta= require ('./answerFlow')
+const flowPedidos3D= require ('./answerFlow')
 
 const flowWelcome = addKeyword(EVENTS.WELCOME)
   .addAnswer([
@@ -27,8 +28,7 @@ const flowWelcome = addKeyword(EVENTS.WELCOME)
       if (!["1", "2", "3", "4", "5", "6"].includes(clientAnswer)) {
         return fallBack("Whoops! no me has dado un numero que pertenezca a la lista! 😫");
       } 
-    },
-    flowVenta
+    }, flowPedidos3D
   )
 
 module.exports = flowWelcome;

@@ -3,7 +3,7 @@ const { addKeyword } = require("@bot-whatsapp/bot");
 const GoogleSheetService = require("../services/index");
 
 const googleSheet = new GoogleSheetService(
-  "1WqK3LZ_dvKg4gIVT6iwhkna2X7RR84odyWvHMtO9xOk"
+  "16-36L83cctMUzjJ8IJh1INEEstmRNKqbpG5_aJhQFs8"
 );
 
 const GLOBAL_STATE = [];
@@ -25,5 +25,19 @@ const flowVenta = addKeyword("1").addAnswer(
 });
 
 
-const flowPedidos3D = 
-module.exports = flowVenta;
+const flowPedidos3D = addKeyword("2").addAnswer(
+  "Encantado de mostrarte como va el pedido de las impresiones 3D!",
+  null,
+  async (_, { flowDynamic }) => {
+    try{
+    const getList = await googleSheet.retrive3DList();
+    for (const stockList3d of getList) {
+      GLOBAL_STATE.push(stockList3d);
+      await flowDynamic(stockList3d);
+    }
+  }
+  catch(error){
+    console.log(error)
+  }
+});
+module.exports = flowPedidos3D;

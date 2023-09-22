@@ -31,7 +31,7 @@ class GoogleSheetService {
         const sheet = this.doc.sheetsByIndex[0]; //# de hoja del google sheet
         await sheet.loadCells("A1:H7");
         
-        for (let rowIndex = 1; rowIndex <= 5; rowIndex++) {  
+        for (let rowIndex = 1; rowIndex <= 5; rowIndex++) break; {  
             const item = {
                 Item: sheet.getCell(rowIndex, 0).value,
                 Codigo: sheet.getCell(rowIndex, 1).value,
@@ -56,9 +56,10 @@ class GoogleSheetService {
         const list3d = [];
         await this.doc.loadInfo();
         const sheet = this.doc.sheetsByIndex[1];  
-        await sheet.loadCells("A1:H20");
+        await sheet.loadCells("A1:H2");
+        console.log(list3d)
         
-        for (let rowIndex = 1; rowIndex <= 5; rowIndex++) {  // Suponiendo que las filas de datos comienzan en la fila 2 (índice 1)
+        for (let rowIndex = 1; rowIndex <= 7; rowIndex++) break; { 
             const item = {
                 fecha: sheet.getCell(rowIndex, 0).value,
                 codigo: sheet.getCell(rowIndex, 1).value,
