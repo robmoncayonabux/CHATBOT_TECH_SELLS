@@ -21,11 +21,11 @@ const flowWelcome = addKeyword(EVENTS.WELCOME)
       "Por favor escribe el *numero* de la opcion que necesites! 🙇🏻‍♂️",
     ],
 
-    { capture: true, delay: 700 },
+    { capture: true, delay: 400 },
 
     async (ctx, { fallBack }) => {
       const clientAnswer = ctx.body;
-      if (!["1", "2", "3", "4", "5", "6"].includes(clientAnswer)) {
+      if (!["1", "2", "3", "4", "5", "6"].includes(clientAnswer) ) {
         return fallBack("Whoops! no me has dado un numero que pertenezca a la lista! 😫");
       } 
     }, flowPedidos3D
