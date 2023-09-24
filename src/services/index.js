@@ -52,38 +52,43 @@ class GoogleSheetService {
   }
   async retrive3DList(targetCode) {
     try {
-      await this.doc.loadInfo();
-      const sheet = this.doc.sheetsByIndex[1];
-      await sheet.loadCells("A1:H2");
+        await this.doc.loadInfo();
+        const sheet = this.doc.sheetsByIndex[1];
+        await sheet.loadCells(); 
 
+        const rows = sheet.rowCount;
+        console.log('Número de filas:', rows);
 
-      for (let rowIndex = 1; rowIndex <= sheet.rowCount; rowIndex++) {
-        const codigo = sheet.getCell(rowIndex, 1).value;
-        if (codigo === targetCode) {
-          break;
+        for (let rowIndex = 1; rowIndex < rows; rowIndex++) {  
+            const numeroClienteCell = sheet.getCell(rowIndex, 1); 
+            console.log('Comparando:', numeroClienteCell.value, String(targetCode));
+            if (String(numeroClienteCell.value) === String(targetCode)) {
+                const item = {
+                    fecha: sheet.getCell(rowIndex, 0).value,
+                    NumeroCliente: numeroClienteCell.value,
+                    link: sheet.getCell(rowIndex, 2).value,
+                    altura: sheet.getCell(rowIndex, 3).value,
+                    contenido: sheet.getCell(rowIndex, 4).value,
+                    pintura: sheet.getCell(rowIndex, 5).value,
+                    observaciones: sheet.getCell(rowIndex, 6).value,
+                    proceso: sheet.getCell(rowIndex, 7).value,
+                };
+                console.log("Item encontrado:", item);
+                return item;
+            }
         }
-        const item = {
-          fecha: sheet.getCell(rowIndex, 0).value,
-          codigo: codigo,
-          link: sheet.getCell(rowIndex, 2).value,
-          altura: sheet.getCell(rowIndex, 3).value,
-          contenido: sheet.getCell(rowIndex, 4).value,
-          pintura: sheet.getCell(rowIndex, 5).value,
-          observaciones: sheet.getCell(rowIndex, 6).value,
-          proceso: sheet.getCell(rowIndex, 7).value,
-        };
-        console.log(item)
-        return item;
-      }
 
-    console.log('Código no encontrado.');
-    return null; 
+        console.log('Código no encontrado.');
+        return null;
 
     } catch (err) {
-      console.log(err);
-      return undefined;
+        console.log(err);
+        return undefined;
     }
   }
+
+
+
 
   // Guardar pedido
   async saveOrder(data) {
