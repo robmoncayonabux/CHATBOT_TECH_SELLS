@@ -2,6 +2,7 @@ const { addKeyword, EVENTS } = require("@bot-whatsapp/bot");
 
 const { flowCatalog, flowPrint3D } = require('./answerFlow');
 
+
 const flowWelcome = addKeyword(EVENTS.WELCOME)
   .addAnswer([
     "¡Hola! Bienvenido al servicio de atención al cliente de Computerías",
@@ -10,7 +11,7 @@ const flowWelcome = addKeyword(EVENTS.WELCOME)
   .addAnswer(
     [
       "*MENU PRINCIPAL*",
-      "1. Venta de computadoras y equipos. 🛒 ",
+      "1. Venta de Computadores y Equipos. 🛒",
       "2. Impresión 3D. 🎨",
       "3. Mantenimientos y Reparaciones. 🔧",
       "4. Consolas y Juegos. 🎮",
