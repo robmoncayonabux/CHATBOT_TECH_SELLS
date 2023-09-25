@@ -92,10 +92,10 @@ class GoogleSheetService {
     }
   }
   
-  async showResultSorteos(targetCode) {
+  async showResult3(targetCode) {
     try {
       await this.doc.loadInfo("A1:I200");
-      const sheet = this.doc.sheetsByIndex[6];
+      const sheet = this.doc.sheetsByIndex[3];
       await sheet.loadCells();
 
       const rows = sheet.rowCount;

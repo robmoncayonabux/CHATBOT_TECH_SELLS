@@ -24,6 +24,7 @@ const flowWelcome = addKeyword(EVENTS.WELCOME)
     { capture: true, delay: 400 },
 
     async (ctx, { fallBack }) => {
+      console.log('La informacion del cliente', ctx)
       const clientAnswer = ctx.body;
       if (!["1", "2", "3", "4", "5", "6"].includes(clientAnswer) ) {
         return fallBack("Whoops! no me has dado un numero que pertenezca a la lista! 😫");

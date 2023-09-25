@@ -1,4 +1,4 @@
-const { addKeyword } = require("@bot-whatsapp/bot");
+const { addKeyword, EVENTS } = require("@bot-whatsapp/bot");
 
 const GoogleSheetService = require("../services/sheet");
 
@@ -12,7 +12,7 @@ const googleSheet = new GoogleSheetService(
   "16-36L83cctMUzjJ8IJh1INEEstmRNKqbpG5_aJhQFs8"
 );
 
-const flowCustomer = addKeyword("$$$esto__es__secreto$$", { sensitive:true, delay: 700 })
+const flowCustomer = addKeyword(EVENTS.ACTION, { sensitive:true, delay: 700 })
   .addAnswer([
     "Empecemos con tu solicitud!",
     "",
