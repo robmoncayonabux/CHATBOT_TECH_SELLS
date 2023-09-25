@@ -28,10 +28,8 @@ class GoogleSheetService {
       const sheet = this.doc.sheetsByIndex[0];
       await sheet.loadCells();
 
-      const rows = sheet.rowCount;
-      console.log("Número de filas:", rows);
 
-      for (let rowIndex = 1; rowIndex < rows; rowIndex++) {
+      for (let rowIndex = 1; rowIndex < 100; rowIndex++) {
         const numberCodeCell = sheet.getCell(rowIndex, 1);
         console.log("Comparando:", numberCodeCell.value, String(targetCode)); //Este es un console.log que me verifica si coinciden los #s
         if (String(numberCodeCell.value) === String(targetCode)) {
@@ -60,7 +58,7 @@ class GoogleSheetService {
     try {
       await this.doc.loadInfo("A1:G200");
       const sheet = this.doc.sheetsByIndex[1];
-      await sheet.loadCells();
+      await sheet.loadCells("A1:G200");
 
       const rows = sheet.rowCount;
       console.log("Número de filas:", rows);

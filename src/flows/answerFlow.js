@@ -17,7 +17,7 @@ const flowCatalog = addKeyword(["1", "4"], { sensitive: true })
     "¯\_(ツ)_/¯",
     {
       media:
-      "https://drive.google.com/uc?export=view&id=1koq6LnxKtWzHR9ApKwdsp6y9zH5S_C18"
+        "https://drive.google.com/uc?export=view&id=1koq6LnxKtWzHR9ApKwdsp6y9zH5S_C18",
     },
     null
   )
@@ -34,15 +34,16 @@ const flowCatalog = addKeyword(["1", "4"], { sensitive: true })
             "Ay... ese codigo no esta en mi base de datos! vuelvelo a intentar nuevamente! 👨🏻‍💻"
           );
         }
-        await flowDynamic(
-          "Excelente elección! comencemos con la solicitud de compra!"
-        );
-        await gotoFlow(flowCustomer);
       } catch (error) {
         console.log(error);
       }
     }
-  );
+  )
+  .addAnswer(    
+    "Excelente elección! comencemos con la solicitud de compra!", null,     
+    async (_, {gotoFlow }) => {
+      gotoFlow(flowCustomer)
+    })
 
 
 const flowPrint3D = addKeyword("2", { sensitive: true })
