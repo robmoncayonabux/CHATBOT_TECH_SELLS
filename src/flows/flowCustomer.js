@@ -1,16 +1,19 @@
 const { addKeyword } = require("@bot-whatsapp/bot");
 
-const GoogleSheetService = require("../services/index");
+const GoogleSheetService = require("../services/sheet");
 
-const {getDay} = require ("date-fns")
+const { getDay } = require("date-fns");
 
-const {generateCustomerCode} = require ('../services/inventory/codeClientGenerator')
+const {
+  generateCustomerCode,
+} = require("../utils/codeClientGenerator");
+const {flowCatalog } = require("./answerFlow");
 
 const googleSheet = new GoogleSheetService(
   "16-36L83cctMUzjJ8IJh1INEEstmRNKqbpG5_aJhQFs8"
 );
 
-const flowCustomer = addKeyword("3", { sensitive: true })
+const flowCustomer = addKeyword("3", { sensitive: true, delay: 700 })
   .addAnswer([
     "Empecemos con tu solicitud!",
     "",
@@ -49,11 +52,10 @@ const flowCustomer = addKeyword("3", { sensitive: true })
     { capture: true },
     async (ctx, { state, fallBack }) => {
       const clientAnswer = ctx.body;
-      if (!["si", "no"].includes(clientAnswer)) {
-      fallBack("Whoops! solo dime que *si* o que *no*! 😫");
+      if (!["si", "no", "Si", "No"].includes(clientAnswer)) {
+        fallBack("Whoops! solo dime que *si* o que *no*! 😫");
       }
       state.update({ delivery: clientAnswer });
-      return;
     }
   )
   .addAnswer(
@@ -63,29 +65,35 @@ const flowCustomer = addKeyword("3", { sensitive: true })
       state.update({ observation: ctx.body });
     }
   )
-  .addAction(async (_, { state }) => {
-    state.update({ status: "Pendiente de pago" });
-  })
-  .addAction(async (ctx, { state }) => {
-    const customerNumber = ctx.from;
-    console.log("Numero del cliente", customerNumber)
-    state.update({ clientNumber: customerNumber });
-  })
-  .addAction(
-    async (_, { }) => {
-    customerCode = generateCustomerCode();
-    return console.log("Codigo del cliente", customerCode );
-  })
   .addAnswer(
-    "Perfecto ya llenamos tu solicitud",
+    "Estamos guardando los detalles de tu pedido... por favor espera",
     null,
-    async (_, { state }) => {
+    async (ctx, { state }) => {
+      customerCode = generateCustomerCode();
+      state.update({
+        status: "Pendiente de pago",
+        productCode: flowCatalog.getProduct.Codigo,
+        clientNumber: ctx.from,
+        customerCode: customerCode,
+      });
+    }
+  )
+
+  .addAnswer([
+    "Perfecto ya llenamos tu solicitud",
+    "",
+    "Su codigo de cliente es:",
+  ],
+    null,
+    async (_, { state, flowDynamic }) => {
       const currentState = state.getMyState();
+      console.log("Este es mi currentState", currentState);
+      flowDynamic(`${currentState.customerCode}`)
       try {
         await googleSheet.saveOrder({
           date: new Date().toDateString(),
-          clientNumber: currentState.clientCode,
-          productCode: "",
+          customerCode: currentState.customerCode,
+          productCode: currentState.productCode,
           price: "",
           delivery: currentState.delivery,
           priceDelivery: "",
@@ -94,9 +102,9 @@ const flowCustomer = addKeyword("3", { sensitive: true })
           lastname: currentState.lastname,
           direction: currentState.direction,
           city: currentState.city,
-          clientNumber:currentState.clientNumber,
+          clientNumber: currentState.clientNumber,
           observation: currentState.observation,
-          status: currentState.status
+          status: currentState.status,
         });
       } catch (error) {
         console.log(error);
@@ -104,4 +112,4 @@ const flowCustomer = addKeyword("3", { sensitive: true })
     }
   );
 
-  module.exports = flowCustomer
+module.exports = flowCustomer;
