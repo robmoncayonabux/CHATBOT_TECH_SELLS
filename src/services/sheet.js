@@ -91,6 +91,42 @@ class GoogleSheetService {
       return undefined;
     }
   }
+  
+  async showResultSorteos(targetCode) {
+    try {
+      await this.doc.loadInfo("A1:I200");
+      const sheet = this.doc.sheetsByIndex[6];
+      await sheet.loadCells();
+
+      const rows = sheet.rowCount;
+      console.log("Número de filas:", rows);
+
+      for (let rowIndex = 1; rowIndex < rows; rowIndex++) {
+        const numberClientCell = sheet.getCell(rowIndex, 1);
+        console.log("Comparando:", numberClientCell.value, String(targetCode)); //Este es un console.log que me verifica si coinciden los #s
+        if (String(numberClientCell.value) === String(targetCode)) {
+          const item = {
+            puesto: sheet.getCell(rowIndex, 0).value,
+            nombre: numberClientCell.value,
+            estado: sheet.getCell(rowIndex, 2).value,
+            'Sorteo activo?': sheet.getCell(rowIndex, 3).value,
+            'Que se sortea?': sheet.getCell(rowIndex, 4).value,
+            puesto: sheet.getCell(rowIndex, 5).value,
+            precio: sheet.getCell(rowIndex, 6).value,
+          };
+          console.log("Item encontrado:", item);
+          return item;
+        }
+      }
+
+      console.log("Código no encontrado.");
+      return null;
+    } catch (err) {
+      console.log(err);
+      return undefined;
+    }
+  }
+  
 
   // Guardar pedido
   async saveOrder(data) {
