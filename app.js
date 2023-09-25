@@ -4,13 +4,13 @@ const BaileysProvider = require('@bot-whatsapp/provider/baileys')
 const QRPortalWeb = require('@bot-whatsapp/portal')
 const MockAdapter = require('@bot-whatsapp/database/mock')
 
-const welcomeFlow = require('./src/flows/welcomeFlow')
+const flowWelcome = require('./src/flows/welcomeFlow')
 
 
 
   const main = async () => {
     const adapterDB = new MockAdapter();
-    const adapterFlow = createFlow([welcomeFlow])
+    const adapterFlow = createFlow([flowWelcome])
     const adapterProvider = createProvider(BaileysProvider);
     
     
