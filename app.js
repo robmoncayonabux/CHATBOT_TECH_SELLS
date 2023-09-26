@@ -5,12 +5,13 @@ const QRPortalWeb = require('@bot-whatsapp/portal')
 const MockAdapter = require('@bot-whatsapp/database/mock')
 
 const flowWelcome = require('./src/flows/welcomeFlow')
+const flowCustomer = require('./src/flows/customerFlow')
 
 
 
   const main = async () => {
     const adapterDB = new MockAdapter();
-    const adapterFlow = createFlow([flowWelcome])
+    const adapterFlow = createFlow([flowWelcome, flowCustomer])
     const adapterProvider = createProvider(BaileysProvider);
     
     
