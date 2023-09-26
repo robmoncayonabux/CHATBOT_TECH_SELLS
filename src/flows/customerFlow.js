@@ -4,15 +4,13 @@ const GoogleSheetService = require("../services/sheet");
 
 const { getDay } = require("date-fns");
 
-const {
-  generateCustomerCode,
-} = require("../utils/codeClientGenerator");
+const { generateCustomerCode } = require("../utils/codeClientGenerator");
 
 const googleSheet = new GoogleSheetService(
   "16-36L83cctMUzjJ8IJh1INEEstmRNKqbpG5_aJhQFs8"
 );
 
-const flowCustomer = addKeyword(EVENTS.ACTION, { sensitive:true, delay: 700 })
+const flowCustomer = addKeyword(EVENTS.ACTION, { delay: 700 })
   .addAnswer([
     "Empecemos con tu solicitud!",
     "",
@@ -22,12 +20,12 @@ const flowCustomer = addKeyword(EVENTS.ACTION, { sensitive:true, delay: 700 })
     "¿Cuál es tu nombre?",
     { capture: true },
     async (ctx, { state }) => {
-      try{
-      state.update({ name: ctx.body });
-    } catch(err) {
-      console.log(err)
+      try {
+        state.update({ name: ctx.body });
+      } catch (err) {
+        console.log(err);
+      }
     }
-  }
   )
   .addAnswer(
     "¿Cuál es tu apellido?",
@@ -82,16 +80,13 @@ const flowCustomer = addKeyword(EVENTS.ACTION, { sensitive:true, delay: 700 })
     }
   )
 
-  .addAnswer([
-    "Perfecto ya llenamos tu solicitud",
-    "",
-    "Su codigo de cliente es:",
-  ],
+  .addAnswer(
+    ["Perfecto ya llenamos tu solicitud", "", "Su codigo de cliente es:"],
     null,
     async (_, { state, flowDynamic }) => {
       const currentState = state.getMyState();
       console.log("Este es mi currentState", currentState);
-      flowDynamic(`${currentState.customerCode}`)
+      flowDynamic(`${currentState.customerCode}`);
       try {
         await googleSheet.saveOrder({
           date: new Date().toDateString(),
@@ -115,6 +110,4 @@ const flowCustomer = addKeyword(EVENTS.ACTION, { sensitive:true, delay: 700 })
     }
   );
 
-  module.exports = flowCustomer
-  
-
+module.exports = flowCustomer;
