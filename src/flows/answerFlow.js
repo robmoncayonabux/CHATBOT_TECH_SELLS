@@ -14,34 +14,36 @@ const flowCatalog = addKeyword(["1", "4"], { sensitive: true })
     "Abre el catalogo e indicame que producto deseas! *_Cargando Archivo_* 🤖"
   )
   .addAnswer(
-    "¯\_(ツ)_/¯",
+    "Hey, aqui el catalago!",
     {
       media:
-        "https://drive.google.com/uc?export=view&id=1koq6LnxKtWzHR9ApKwdsp6y9zH5S_C18",
+        "https://web.seducoahuila.gob.mx/biblioweb/upload/el%20principito.pdf",
     },
     null
   )
   .addAnswer(
     ["Escribeme el *codigo* del producto que deseas, espero tu respuesta! 🤖"],
     { capture: true },
-    async (ctx, { fallBack, flowDynamic, gotoFlow }) => {
+    async (ctx, { state, fallBack }) => {
       const targetCode = ctx.body;
       try {
         const getProduct = await googleSheet.showResult0(targetCode);
-        console.log(getProduct);
+        state.update({productCode: getProduct.Codigo})
         if (getProduct === null) {
           fallBack(
             "Ay... ese codigo no esta en mi base de datos! vuelvelo a intentar nuevamente! 👨🏻‍💻"
           );
         }
-      } catch (error) {
+      }
+      
+      catch (error) {
         console.log(error);
       }
     }
   )
   .addAnswer(    
     "Excelente elección! comencemos con la solicitud de compra!", null,     
-    async (_, {gotoFlow }) => {
+    async (_, { state, gotoFlow }) => {
       gotoFlow(flowCustomer)
     })
 
@@ -161,3 +163,4 @@ module.exports = {
   flowSorteo,
   flowVcard
 };
+

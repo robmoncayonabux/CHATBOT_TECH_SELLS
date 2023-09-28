@@ -42,14 +42,14 @@ const flowCustomer = addKeyword(EVENTS.ACTION, { delay: 700 })
     }
   )
   .addAnswer(
-    "¿Cual es tu dirección?",
+    "¿Cuál es tu dirección?",
     { capture: true },
     async (ctx, { state }) => {
       state.update({ direction: ctx.body });
     }
   )
   .addAnswer(
-    "¿Quieres delivery?",
+    "¿Quieres envío a domicilio?",
     { capture: true },
     async (ctx, { state, fallBack }) => {
       const clientAnswer = ctx.body;
@@ -73,7 +73,6 @@ const flowCustomer = addKeyword(EVENTS.ACTION, { delay: 700 })
       customerCode = generateCustomerCode();
       state.update({
         status: "Pendiente de pago",
-        productCode: "flowCatalog.getProduct.Codigo",
         clientNumber: ctx.from,
         customerCode: customerCode,
       });

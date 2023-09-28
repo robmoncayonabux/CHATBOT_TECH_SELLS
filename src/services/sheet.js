@@ -57,7 +57,7 @@ class GoogleSheetService {
   async showResult1(targetCode) {
     try {
       await this.doc.loadInfo("A1:G200");
-      const sheet = this.doc.sheetsByIndex[1];
+      const sheet = this.doc.sheetsByIndex[2];
       await sheet.loadCells("A1:G200");
 
       const rows = sheet.rowCount;
@@ -93,7 +93,7 @@ class GoogleSheetService {
   async showResult3(targetCode) {
     try {
       await this.doc.loadInfo("A1:I200");
-      const sheet = this.doc.sheetsByIndex[3];
+      const sheet = this.doc.sheetsByIndex[SORTEOS];
       await sheet.loadCells();
 
       const rows = sheet.rowCount;
@@ -129,13 +129,13 @@ class GoogleSheetService {
   // Guardar pedido
   async saveOrder(data) {
     await this.doc.loadInfo();
-    const sheet = this.doc.sheetsByIndex[2];
+    const sheet = this.doc.sheetsByIndex[3];
     console.log(sheet.title);
     try {
       const order = await sheet.addRow({
         Fecha: data.date,
         'Numero Cliente': data.customerCode,
-        'Codigos Producto': "",
+        'Codigos Producto': data.productCode,
         'Precio': "",
         'Envio?': data.delivery,
         'Precio Envio': "",
