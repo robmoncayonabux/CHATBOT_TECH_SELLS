@@ -1,4 +1,4 @@
-module.exports.generateCustomerCode = () => {
+generateCustomerCode = () => {
   // Genera un número aleatorio entre 0 y 999999999999 (12 dígitos)
   const randomNum = Math.floor(Math.random() * 1_000_000_000_000);
   
@@ -8,4 +8,6 @@ module.exports.generateCustomerCode = () => {
   return customerCode;
 }
 
+
+module.exports = { generateCustomerCode };
 
