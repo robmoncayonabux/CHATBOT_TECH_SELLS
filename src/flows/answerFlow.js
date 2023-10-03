@@ -2,7 +2,7 @@ const { addKeyword } = require("@bot-whatsapp/bot");
 
 const GoogleSheetService = require("../services/sheet");
 
-const  flowCustomer  = require("./customerFlow");
+const  {flowCustomer}  = require("./customerFlow");
 
 const googleSheet = new GoogleSheetService(
   "16-36L83cctMUzjJ8IJh1INEEstmRNKqbpG5_aJhQFs8"
@@ -24,11 +24,13 @@ const flowCatalog = addKeyword(["1", "4"], { sensitive: true })
   .addAnswer(
     ["Escribeme el *codigo* del producto que deseas, espero tu respuesta! 🤖"],
     { capture: true },
-    async (ctx, { state, fallBack }) => {
+    async (ctx, { state, fallBack, flowDynamic }) => {
       const targetCode = ctx.body;
       try {
         const getProduct = await googleSheet.showResult0(targetCode);
-        state.update({productCode: getProduct.Codigo})
+        state.update({productCode: getProduct.Codigo, 
+        productname: getProduct.Nombre})
+        flowDynamic(`*USTED A PEDIDO*: ${getProduct.Nombre} 😎`)
         if (getProduct === null) {
           fallBack(
             "Ay... ese codigo no esta en mi base de datos! vuelvelo a intentar nuevamente! 👨🏻‍💻"
@@ -43,7 +45,7 @@ const flowCatalog = addKeyword(["1", "4"], { sensitive: true })
   )
   .addAnswer(    
     "Excelente elección! comencemos con la solicitud de compra!", null,     
-    async (_, { state, gotoFlow }) => {
+    async (_, { gotoFlow }) => {
       gotoFlow(flowCustomer)
     })
 
