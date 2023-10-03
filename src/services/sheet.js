@@ -148,7 +148,6 @@ class GoogleSheetService {
         Observaciones: data.observation,
         Estatus: data.status,
       });
-      console.log("este es el order", order);
       return order;
     } catch (error) {
       throw error;
