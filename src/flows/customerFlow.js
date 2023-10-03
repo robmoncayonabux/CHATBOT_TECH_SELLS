@@ -1,15 +1,13 @@
+const { getDay } = require("date-fns");
+
 const { addKeyword, EVENTS } = require("@bot-whatsapp/bot");
 
 const GoogleSheetService = require("../services/sheet");
-
-const { getDay } = require("date-fns");
-
-const { generateCustomerCode } = require("../utils/codeClientGenerator");
+const  { generateCustomerCode }  = require("../utils/codeClientGenerator");
 
 const googleSheet = new GoogleSheetService(
   "16-36L83cctMUzjJ8IJh1INEEstmRNKqbpG5_aJhQFs8"
 );
-
 const flowCustomer = addKeyword(EVENTS.ACTION, { delay: 700 })
   .addAnswer([
     "Empecemos con tu solicitud!",
@@ -70,7 +68,7 @@ const flowCustomer = addKeyword(EVENTS.ACTION, { delay: 700 })
     "Estamos guardando los detalles de tu pedido... por favor espera",
     null,
     async (ctx, { state }) => {
-      customerCode = generateCustomerCode();
+      const customerCode = generateCustomerCode();
       state.update({
         status: "Pendiente de pago",
         clientNumber: ctx.from,
@@ -78,9 +76,77 @@ const flowCustomer = addKeyword(EVENTS.ACTION, { delay: 700 })
       });
     }
   )
-
   .addAnswer(
-    ["Perfecto ya llenamos tu solicitud", "", "Su codigo de cliente es:"],
+    "Perfecto ya llenamos tu solicitud \n Su codigo de pedido es:",
+    null,
+    async (_, { state, flowDynamic }) => {
+      const currentState = state.getMyState();
+      const RESPONSE_CODE_MESSAGE = `${currentState.customerCode}`;
+      await googleSheet.saveOrder({
+        date: new Date().toDateString(),
+        customerCode: currentState.customerCode,
+        productCode: currentState.productCode,
+        price: "",
+        delivery: currentState.delivery,
+        priceDelivery: "",
+        total: "",
+        name: currentState.name,
+        lastname: currentState.lastname,
+        direction: currentState.direction,
+        city: currentState.city,
+        clientNumber: currentState.clientNumber,
+        observation: currentState.observation,
+        status: currentState.status,
+      });
+      flowDynamic(RESPONSE_CODE_MESSAGE);
+      return;
+    }
+  )
+  .addAnswer(
+    [
+      "Deseas hacer otra compra?",
+      'Responde "SI" para continuar, "NO" para regresar al menu principal! 🤖',
+    ],
+    { capture: true },
+    async (ctx, { gotoFlow, endFlow, flowDynamic, fallBack }) => {
+      const clientAnswer = ctx.body;
+      if (!["NO", "SI"].includes(clientAnswer)) {
+        fallBack("Whoops! solo dime que *SI* o que *NO*! 😫");
+      }
+      if (["SI"].includes(clientAnswer)) {
+        flowDynamic("Me encanta!! 🤩");
+        gotoFlow(AnotherSell);
+        return;
+      }
+      if (["NO"].includes(clientAnswer)) {
+        endFlow();
+        return;
+      }
+    }
+  );
+const AnotherSell = addKeyword(EVENTS.ACTION)
+  .addAnswer(
+    ["Escribeme el *codigo* del producto que deseas, espero tu respuesta! 🤖"],
+    { capture: true },
+    async (ctx, { state, fallBack }) => {
+      const targetCode = ctx.body;
+      try {
+        const getProduct = await googleSheet.showResult0(targetCode);
+        state.update({ productCode: getProduct.Codigo });
+        if (getProduct === null) {
+          fallBack(
+            "Ay... ese codigo no esta en mi base de datos! vuelvelo a intentar nuevamente! 👨🏻‍💻"
+          );
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  )
+  .addAnswer(
+    [
+      `Perfecto ya llenamos tu solicitud \n Su codigo de pedido es *el mismo*:`,
+    ],
     null,
     async (_, { state, flowDynamic }) => {
       const currentState = state.getMyState();
@@ -107,6 +173,26 @@ const flowCustomer = addKeyword(EVENTS.ACTION, { delay: 700 })
         console.log(error);
       }
     }
+  )
+  .addAnswer(
+    [
+      "Deseas hacer otra compra?",
+      'Responde "SI" para continuar, "NO" para regresar al menu principal! 🤖',
+    ],
+    { capture: true },
+    async (ctx, { gotoFlow, endFlow, flowDynamic, fallBack }) => {
+      const clientAnswer = ctx.body;
+      if (!["NO", "SI"].includes(clientAnswer)) {
+        fallBack("Whoops! solo dime que *SI* o que *NO*! 😫");
+      }
+      if (["SI"].includes(clientAnswer)) {
+        flowDynamic("Me encanta!! 🤩");
+        gotoFlow(AnotherSell);
+      }
+      if (["NO"].includes(clientAnswer)) {
+        endFlow();
+      }
+    }
   );
 
-module.exports = flowCustomer;
+module.exports = { flowCustomer, AnotherSell };
