@@ -22,7 +22,7 @@ class GoogleSheetService {
     this.doc = new GoogleSpreadsheet(id, this.jwtFromEnv);
   }
 
-  async showResult0(targetCode) {
+  async showResultCatalog(targetCode) {
     try {
       await this.doc.loadInfo("A1:G200");
       const sheet = this.doc.sheetsByIndex[0];
@@ -54,10 +54,43 @@ class GoogleSheetService {
       return undefined;
     }
   }
-  async showResult1(targetCode) {
+
+  async showResultCatalogGamer(targetCode) {
     try {
       await this.doc.loadInfo("A1:G200");
-      const sheet = this.doc.sheetsByIndex[2];
+      const sheet = this.doc.sheetsByIndex[1];
+      await sheet.loadCells();
+
+
+      for (let rowIndex = 1; rowIndex < 100; rowIndex++) {
+        const numberCodeCell = sheet.getCell(rowIndex, 1);
+        console.log("Comparando:", numberCodeCell.value, String(targetCode)); //Este es un console.log que me verifica si coinciden los #s
+        if (String(numberCodeCell.value) === String(targetCode)) {
+          const item = {
+            item: sheet.getCell(rowIndex, 0).value,
+            Codigo: numberCodeCell.value,
+            Nombre: sheet.getCell(rowIndex, 2).value,
+            Categoria: sheet.getCell(rowIndex, 3).value,
+            Descripcion: sheet.getCell(rowIndex, 4).value,
+            Stock: sheet.getCell(rowIndex, 5).value,
+            Precio: sheet.getCell(rowIndex, 6).value,
+          };
+          console.log("Item encontrado:", item);
+          return item;
+        }
+      }
+
+      console.log("Código no encontrado.");
+      return null;
+    } catch (err) {
+      console.log(err);
+      return undefined;
+    }
+  }
+  async showResultPrint3D(targetCode) {
+    try {
+      await this.doc.loadInfo("A1:G200");
+      const sheet = this.doc.sheetsByIndex[3];
       await sheet.loadCells("A1:G200");
 
       const rows = sheet.rowCount;
@@ -129,17 +162,16 @@ class GoogleSheetService {
   // Guardar pedido
   async saveOrder(data) {
     await this.doc.loadInfo();
-    const sheet = this.doc.sheetsByIndex[3];
+    const sheet = this.doc.sheetsByIndex[2];
     console.log(sheet.title);
     try {
       const order = await sheet.addRow({
         Fecha: data.date,
         'Numero Cliente': data.customerCode,
         'Codigos Producto': data.productCode,
-        'Precio': "",
+        'Precio': data.price,
         'Envio?': data.delivery,
-        'Precio Envio': "",
-        Total: "",
+        Cantidad: data.amount,
         Nombre: data.name,
         Apellido: data.lastname,
         Direccion: data.direction,
@@ -153,6 +185,34 @@ class GoogleSheetService {
       throw error;
     }
   }
+
+    // Guardar pedido
+    async saveOrderPrint3D(data) {
+      await this.doc.loadInfo();
+      const sheet = this.doc.sheetsByIndex[2];
+      console.log(sheet.title);
+      try {
+        const order = await sheet.addRow({
+          Fecha: data.date,
+          'Numero Cliente': data.customerCode,
+          'Codigos Producto': data.productCode,
+          'Precio': "",
+          'Envio?': data.delivery,
+          'Precio Envio': "",
+          Total: "",
+          Nombre: data.name,
+          Apellido: data.lastname,
+          Direccion: data.direction,
+          Ciudad: data.city,
+          Numero: data.clientNumber,
+          Observaciones: data.observation,
+          Estatus: data.status,
+        });
+        return order;
+      } catch (error) {
+        throw error;
+      }
+    }
 }
 
 
