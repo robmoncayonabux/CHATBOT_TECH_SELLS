@@ -1,6 +1,6 @@
 const { addKeyword, EVENTS } = require("@bot-whatsapp/bot");
 
-const { flowCatalog, flowVcard, flowCatalogGamer } = require('./answerFlow');
+const { flowCatalog, flowVcard, flowCatalogGamer, flowUbication } = require('./answerFlow');
 const {  flowPrint3D, flowPrint3DCustom } = require('./answer3DFlow');
 
 
@@ -35,7 +35,7 @@ const flowWelcome = addKeyword(EVENTS.WELCOME)
         return fallBack("Whoops! no me has dado un numero que pertenezca a la lista! 😫");
       } 
     }, 
-    [flowCatalog, flowPrint3D, flowVcard, flowCatalogGamer, flowPrint3DCustom]
+    [flowCatalog, flowPrint3D, flowVcard, flowCatalogGamer, flowPrint3DCustom, flowUbication]
   );
 
   const flowCancel = addKeyword("CANCELAR", { sensitive: true }).addAnswer(
