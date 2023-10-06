@@ -1,8 +1,9 @@
-const { addKeyword } = require("@bot-whatsapp/bot");
+const { addKeyword, EVENTS } = require("@bot-whatsapp/bot");
 
 const GoogleSheetService = require("../services/sheet");
 
-const { flowCustomer, flowCustomer3D } = require("./customerFlow");
+const  {flowCustomer}  = require("./customerFlow");
+
 
 const googleSheet = new GoogleSheetService(
   "16-36L83cctMUzjJ8IJh1INEEstmRNKqbpG5_aJhQFs8"
@@ -28,18 +29,19 @@ const flowCatalog = addKeyword(["1"], { sensitive: true })
       const targetCode = ctx.body;
       try {
         const getProduct = await googleSheet.showResultCatalog(targetCode);
-        state.update({
-          productCode: getProduct.Codigo,
-          productname: getProduct.Nombre,
-        });
-        flowDynamic(`*USTED A PEDIDO*: ${getProduct.Nombre} 😎`);
         if (getProduct === null) {
           fallBack(
             "Ay... ese codigo no esta en mi base de datos! vuelvelo a intentar nuevamente! 👨🏻‍💻"
           );
         }
+        state.update({
+          productCode: getProduct.Codigo,
+          productname: getProduct.Nombre,
+          productPrice: getProduct.Precio
+        });
+        flowDynamic(`*USTED A PEDIDO*: ${getProduct.Nombre} 😎`);
       } catch (error) {
-        console.log(error);
+        return console.log(error);
       }
     }
   )
@@ -63,56 +65,42 @@ const flowCatalog = addKeyword(["1"], { sensitive: true })
   .addAnswer(
     "Excelente elección! comencemos con la solicitud de compra!",
     { delay: 200 },
-    async (_, { gotoFlow }) => {
+    async (ctx, { gotoFlow }) => {
       gotoFlow(flowCustomer);
     }
   );
 
-const flowPrint3D = addKeyword("2", { sensitive: true })
-  .addAnswer(
-    [
-      "Encantado de atenderte en la opcion de impresiones 3D!",
-      "",
-      "*ELIGE UNA OPCION*",
-      "1. Deseo hacer un pedido 📝",
-      "2. Deseo saber como va mi pedido 🔍",
-    ],
-    {
-      capture: true,
-    },
-    async (ctx, { flowDynamic, fallBack, gotoFlow }) => {
-      const clientAnswer = ctx.body;
-      if (!["1", "2"].includes(clientAnswer)) {
-        fallBack(
-          "Whoops! no me has dado un numero que pertenezca a la lista! 😫"
-        );
+  const flowUbication = addKeyword("4", { sensitive: true })
+    .addAnswer(
+      "Visitanos! Esta es nuestra ubicación exacta! 👾⚡",
+      null,
+      async (ctx, { provider }) => {
+        const id = ctx.key.remoteJid;
+        const sock = await provider.getInstance();
+        // send a location!
+        const sentMsg = await sock.sendMessage(id, {
+          location: { degreesLatitude: 5.501274, degreesLongitude: -73.8527 },
+        });
       }
-      if (clientAnswer === "1") {
-        gotoFlow(flowCustomer3D);
-      }
-      if (clientAnswer === "2") {
-        flowDynamic("Cual es tu codigo de pedido? ✌🏻😎");
-      }
-    }
-  )
-  .addAction({ capture: true }, async (ctx, { flowDynamic, fallBack }) => {
-    try {
-      const targetCode = ctx.body;
-      const getProduct = await googleSheet.showResultPrint3D(targetCode);
-      if (getProduct === null) {
-        return fallBack(
-          "Ay... ese codigo no esta en mi base de datos! vuelvelo a intentar nuevamente! 👨🏻‍💻"
-        );
-      }
-      flowDynamic(
-        `Su pedido con numero de cliente *${getProduct.NumeroCliente}* se encuentra en estado *${getProduct.proceso}* 🤓`
-      );
-    } catch (error) {
-      console.log(error);
-    }
-  });
+    )
+    .addAction(async (ctx, { provider }) => {
+      const id = ctx.key.remoteJid;
+      const sock = await provider.getInstance();
 
-const flowCatalogGamer = addKeyword(["4"], { sensitive: true })
+      const sentMsg = await sock.sendMessage(id, { text: 'Nuestro Instagram! 🤩🤳🏻\nhttps://www.instagram.com/computerias_/' });
+    })
+    .addAnswer(
+      [
+        "Me encanto haberte ayudado!",
+        "Escribe cualquier palabra para volver a ver al menu principal! 🥳",
+      ],
+      { delay: 500 },
+      async (_, { endFlow }) => {
+        endFlow();
+      }
+    );
+
+const flowCatalogGamer = addKeyword(["5"], { sensitive: true })
   .addAnswer("Te envío el catalago gamer! 🎮🕹")
   .addAnswer(
     "Abre el catalago gamer e indicame que producto deseas! *_Cargando Archivo_* 🤖"
@@ -132,17 +120,17 @@ const flowCatalogGamer = addKeyword(["4"], { sensitive: true })
       const targetCode = ctx.body;
       try {
         const getProduct = await googleSheet.showResultCatalogGamer(targetCode);
+        if (getProduct === null) {
+          fallBack(
+            "Ay... ese codigo no esta en mi base de datos! vuelvelo a intentar nuevamente! 👨🏻‍💻"
+          );
+        }
         state.update({
           productCode: getProduct.Codigo,
           productname: getProduct.Nombre,
           productPrice: getProduct.Precio,
         });
         flowDynamic(`*USTED A PEDIDO*: ${getProduct.Nombre} 😎`);
-        if (getProduct === null) {
-          fallBack(
-            "Ay... ese codigo no esta en mi base de datos! vuelvelo a intentar nuevamente! 👨🏻‍💻"
-          );
-        }
       } catch (error) {
         console.log(error);
       }
@@ -172,45 +160,8 @@ const flowCatalogGamer = addKeyword(["4"], { sensitive: true })
       gotoFlow(flowCustomer);
     }
   );
-
-const flowVcard = addKeyword("6", { sensitive: true })
-  .addAnswer(
-    "Un gusto darte el contacto de quien te atendera!",
-    null,
-    async (ctx, { provider }) => {
-      // send a contact!
-      const vcard =
-        "BEGIN:VCARD\n" + // metadata of the contact card
-        "VERSION:3.0\n" +
-        "FN:Yeyo Reyes\n" + // full name
-        "ORG:Programador de la Muerte;\n" + // the organization of the contact
-        "TEL;type=CELL;type=VOICE;waid=593995254965:+593995254965\n" + // WhatsApp ID + phone number
-        "END:VCARD";
-
-      const id = ctx.key.remoteJid;
-      const sock = await provider.getInstance();
-
-      const sentMsg = await sock.sendMessage(id, {
-        contacts: {
-          displayName: "Yeyo",
-          contacts: [{ vcard }],
-        },
-      });
-    }
-  )
-
-  .addAnswer(
-    [
-      "Me encanto haberte ayudado!",
-      "Escribe cualquier palabra para volver a ver al menu principal! 🥳",
-    ],
-    { delay: 500 },
-    async (_, { endFlow }) => {
-      endFlow();
-    }
-  );
-
-const flowSorteo = addKeyword("2", { sensitive: true })
+  
+  const flowSorteo = addKeyword("6", { sensitive: true })
   .addAnswer(
     [
       "Encantado de mostrarte todos nuestros sorteos!",
@@ -248,10 +199,47 @@ const flowSorteo = addKeyword("2", { sensitive: true })
     }
   );
 
+const flowVcard = addKeyword("7", { sensitive: true })
+  .addAnswer(
+    "Un gusto darte el contacto de quien te atendera!",
+    null,
+    async (ctx, { provider }) => {
+      // send a contact!
+      const vcard =
+        "BEGIN:VCARD\n" + // metadata of the contact card
+        "VERSION:3.0\n" +
+        "FN:Computerias 💻🔧\n" + // full name
+        "ORG:Computerias 💻🔧;\n" + // the organization of the contact
+        "TEL;type=CELL;type=VOICE;waid=573133160670:+573133160670\n" + // WhatsApp ID + phone number
+        "END:VCARD";
+
+      const id = ctx.key.remoteJid;
+      const sock = await provider.getInstance();
+
+      const sentMsg = await sock.sendMessage(id, {
+        contacts: {
+          displayName: "Computerias",
+          contacts: [{ vcard }],
+        },
+      });
+    }
+  )
+
+  .addAnswer(
+    [
+      "Me encanto haberte ayudado!",
+      "Escribe cualquier palabra para volver a ver al menu principal! 🥳",
+    ],
+    { delay: 500 },
+    async (_, { endFlow }) => {
+      endFlow();
+    }
+  );
+
 module.exports = {
-  flowPrint3D,
   flowCatalog,
   flowCatalogGamer,
   flowSorteo,
   flowVcard,
+  flowUbication
 };

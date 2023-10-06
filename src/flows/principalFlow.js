@@ -1,6 +1,8 @@
 const { addKeyword, EVENTS } = require("@bot-whatsapp/bot");
 
-const { flowCatalog, flowPrint3D, flowVcard, flowCatalogGamer } = require('./answerFlow');
+const { flowCatalog, flowVcard, flowCatalogGamer } = require('./answerFlow');
+const {  flowPrint3D, flowPrint3DCustom } = require('./answer3DFlow');
+
 
 
 const flowWelcome = addKeyword(EVENTS.WELCOME)
@@ -11,12 +13,13 @@ const flowWelcome = addKeyword(EVENTS.WELCOME)
   .addAnswer(
     [
       "*MENU PRINCIPAL*",
-      "1. Venta de Computadores y Equipos. 🛒",
+      "1. Venta de computadores y equipos. 🛒",
       "2. Impresión 3D. 🎨",
-      "3. Ubicación para Mantenimientos y Reparaciones. 🔧",
-      "4. Consolas y Juegos. 🎮",
-      "5. Sorteos activos. 🏆",
-      "6. Hablar con un agente en vivo. 🙍🏻‍♂️",
+      "3. Creaciones 3D personalizadas. 👨🏻‍🎨",
+      "4. Ubicación para atención, mantenimientos y reparaciones. 🔧",
+      "5. Consolas y Juegos. 🎮",
+      "6. Sorteos activos. 🏆",
+      "7. Hablar con un agente en vivo. 🙍🏻‍♂️",
       "",
       "Puedes escribir en cualquier momento *CANCELAR* para cancelar el pedido!",
       "",
@@ -28,11 +31,11 @@ const flowWelcome = addKeyword(EVENTS.WELCOME)
     async (ctx, { fallBack }) => {
       console.log('La informacion del cliente', ctx)
       const clientAnswer = ctx.body;
-      if (!["1", "2", "3", "4", "5", "6"].includes(clientAnswer) ) {
+      if (!["1", "2", "3", "4", "5", "6", "7"].includes(clientAnswer) ) {
         return fallBack("Whoops! no me has dado un numero que pertenezca a la lista! 😫");
       } 
     }, 
-    [flowCatalog, flowPrint3D, flowVcard, flowCatalogGamer]
+    [flowCatalog, flowPrint3D, flowVcard, flowCatalogGamer, flowPrint3DCustom]
   );
 
   const flowCancel = addKeyword("CANCELAR", { sensitive: true }).addAnswer(

@@ -8,11 +8,10 @@ const { generateCustomerCode } = require("../utils/codeClientGenerator");
 const googleSheet = new GoogleSheetService(
   "16-36L83cctMUzjJ8IJh1INEEstmRNKqbpG5_aJhQFs8"
 );
-const flowCustomer = addKeyword(EVENTS.ACTION, { delay: 700 })
+
+const flowCustomer3D = addKeyword(EVENTS.ACTION, { delay: 600 })
   .addAnswer([
-    "Empecemos con tu solicitud!",
-    "",
-    "Ahora necesitare tu información! ✌🏻😎",
+    "Empecemos con tu solicitud!\nAhora necesitare tu información! ✌🏻😎",
   ])
   .addAnswer(
     "¿Cuál es tu nombre?",
@@ -33,35 +32,10 @@ const flowCustomer = addKeyword(EVENTS.ACTION, { delay: 700 })
     }
   )
   .addAnswer(
-    "¿De qué ciudad nos escribes?",
+    "Describeme como te gustaria tu pedido! (Detallalo)",
     { capture: true },
     async (ctx, { state }) => {
-      state.update({ city: ctx.body });
-    }
-  )
-  .addAnswer(
-    "¿Cuál es tu dirección?",
-    { capture: true },
-    async (ctx, { state }) => {
-      state.update({ direction: ctx.body });
-    }
-  )
-  .addAnswer(
-    "¿Quieres envío a domicilio?\n(Costo adicional dependiendo de la ubicación)",
-    { capture: true },
-    async (ctx, { state, fallBack }) => {
-      const clientAnswer = ctx.body;
-      if (!["si", "no", "Si", "No"].includes(clientAnswer)) {
-        fallBack("Whoops! solo dime que *si* o que *no*! 😫");
-      }
-      state.update({ delivery: clientAnswer });
-    }
-  )
-  .addAnswer(
-    "¿Alguna observación sobre este pedido?",
-    { capture: true },
-    async (ctx, { state }) => {
-      state.update({ observation: ctx.body });
+      state.update({ description: ctx.body });
     }
   )
   .addAnswer(
@@ -70,31 +44,27 @@ const flowCustomer = addKeyword(EVENTS.ACTION, { delay: 700 })
     async (ctx, { state }) => {
       const customerCode = generateCustomerCode();
       state.update({
-        status: "Pendiente de pago",
+        status: "En Proceso",
         clientNumber: ctx.from,
         customerCode: customerCode,
       });
     }
   )
   .addAnswer(
-    "Perfecto ya llenamos tu solicitud\nSu codigo de pedido es:",
+    "Perfecto ya llenamos tu solicitud \n Su codigo de pedido es:",
     null,
     async (_, { state, flowDynamic }) => {
       const currentState = state.getMyState();
       flowDynamic(`${currentState.customerCode}`);
-      await googleSheet.saveOrder({
+      await googleSheet.saveOrderPrint3D({
         date: new Date().toDateString(),
         customerCode: currentState.customerCode,
-        productCode: currentState.productCode,
-        price: currentState.productPrice,
-        delivery: currentState.delivery,
-        productAmount: currentState.productAmount,
         name: currentState.name,
         lastname: currentState.lastname,
-        direction: currentState.direction,
-        city: currentState.city,
         clientNumber: currentState.clientNumber,
-        observation: currentState.observation,
+        productAmount: currentState.productAmount,
+        namePrint: currentState.productname,
+        description: currentState.description,
         status: currentState.status,
       });
     }
@@ -112,7 +82,7 @@ const flowCustomer = addKeyword(EVENTS.ACTION, { delay: 700 })
       }
       if (["SI"].includes(clientAnswer)) {
         flowDynamic("Me encanta!! 🤩");
-        gotoFlow(AnotherSell);
+        gotoFlow(Another3DSell);
         return;
       }
       if (["NO"].includes(clientAnswer)) {
@@ -122,7 +92,75 @@ const flowCustomer = addKeyword(EVENTS.ACTION, { delay: 700 })
     }
   );
 
-const AnotherSell = addKeyword(EVENTS.ACTION)
+  const flowCustomer3DCUSTOM = addKeyword(EVENTS.ACTION, { delay: 600 })
+  .addAnswer([
+    "Empecemos con tu solicitud!\nAhora necesitare tu información! ✌🏻😎",
+  ])
+  .addAnswer(
+    "¿Cuál es tu nombre?",
+    { capture: true },
+    async (ctx, { state }) => {
+      try {
+        state.update({ name: ctx.body });
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  )
+  .addAnswer(
+    "¿Cuál es tu apellido?",
+    { capture: true },
+    async (ctx, { state }) => {
+      state.update({ lastname: ctx.body });
+    }
+  )
+  .addAnswer(
+    "Enviame el link de referencia! 👽",
+    { capture: true },
+    async (ctx, { state }) => {
+      state.update({ productLink: ctx.body });
+    }
+  )
+  .addAnswer(
+    "Describeme como te gustaria tu pedido! (Detallalo)",
+    { capture: true },
+    async (ctx, { state }) => {
+      state.update({ description: ctx.body });
+    }
+  )
+  .addAnswer(
+    "Estamos guardando los detalles de tu pedido... por favor espera ⌛",
+    null,
+    async (ctx, { state }) => {
+      const customerCode = generateCustomerCode();
+      state.update({
+        status: "En Proceso",
+        clientNumber: ctx.from,
+        customerCode: customerCode,
+      });
+    }
+  )
+  .addAnswer(
+    "Perfecto ya llenamos tu solicitud \n Su codigo de pedido es:",
+    null,
+    async (_, { state, flowDynamic }) => {
+      const currentState = state.getMyState();
+      flowDynamic(`${currentState.customerCode}`);
+      await googleSheet.saveOrderPrint3D({
+        date: new Date().toDateString(),
+        customerCode: currentState.customerCode,
+        name: currentState.name,
+        lastname: currentState.lastname,
+        clientNumber: currentState.clientNumber,
+        productAmount: currentState.productAmount,
+        namePrint: currentState.productLink,
+        description: currentState.description,
+        status: currentState.status,
+      });
+    }
+  )
+
+  const Another3DSell = addKeyword(EVENTS.ACTION)
 .addAnswer(
   ["Escribeme el *codigo* del producto que deseas, espero tu respuesta! 🤖"],
   { capture: true },
@@ -130,18 +168,15 @@ const AnotherSell = addKeyword(EVENTS.ACTION)
     const targetCode = ctx.body;
     try {
       const getProduct = await googleSheet.showResultCatalog(targetCode);
+      state.update({
+        productCode: getProduct.Codigo,
+        productname: getProduct.Nombre,
+      });
+      flowDynamic(`*USTED A PEDIDO*: ${getProduct.Nombre} 😎`);
       if (getProduct === null) {
-        const getProduct = await googleSheet.showResultCatalogGamer(targetCode);
-        if (getProduct === null) {
-          fallBack(
-            "Ay... ese codigo no esta en mi base de datos! vuelvelo a intentar nuevamente! 👨🏻‍💻"
-          );
-        }
-        state.update({
-          productCode: getProduct.Codigo,
-          productname: getProduct.Nombre,
-        });
-        flowDynamic(`*USTED A PEDIDO*: ${getProduct.Nombre} 😎`);
+        fallBack(
+          "Ay... ese codigo no esta en mi base de datos! vuelvelo a intentar nuevamente! 👨🏻‍💻"
+        );
       }
     } catch (error) {
       console.log(error);
@@ -179,7 +214,7 @@ const AnotherSell = addKeyword(EVENTS.ACTION)
           productCode: currentState.productCode,
           price: currentState.productPrice,
           delivery: currentState.delivery,
-          productAmount: currentState.productAmount,
+          amount: currentState.productAmount,
           name: currentState.name,
           lastname: currentState.lastname,
           direction: currentState.direction,
@@ -206,7 +241,7 @@ const AnotherSell = addKeyword(EVENTS.ACTION)
       }
       if (["SI"].includes(clientAnswer)) {
         flowDynamic("Me encanta!! 🤩");
-        gotoFlow(AnotherSell);
+        gotoFlow(Another3DSell);
       }
       if (["NO"].includes(clientAnswer)) {
         endFlow("Con cualquier saludo inicias el Menu Principal! 🤩");
@@ -214,4 +249,8 @@ const AnotherSell = addKeyword(EVENTS.ACTION)
     }
   );
 
-module.exports = { flowCustomer, AnotherSell };
+  module.exports = {
+    flowCustomer3D,
+    Another3DSell,
+    flowCustomer3DCUSTOM
+  }
