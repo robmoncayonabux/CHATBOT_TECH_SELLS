@@ -2,8 +2,7 @@ const { addKeyword, EVENTS } = require("@bot-whatsapp/bot");
 
 const GoogleSheetService = require("../services/sheet");
 
-const  {flowCustomer}  = require("./customerFlow");
-
+const { flowCustomer, flowCustomerSorteo } = require("./customerFlow");
 
 const googleSheet = new GoogleSheetService(
   "16-36L83cctMUzjJ8IJh1INEEstmRNKqbpG5_aJhQFs8"
@@ -37,7 +36,7 @@ const flowCatalog = addKeyword(["1"], { sensitive: true })
         state.update({
           productCode: getProduct.Codigo,
           productname: getProduct.Nombre,
-          productPrice: getProduct.Precio
+          productPrice: getProduct.Precio,
         });
         flowDynamic(`*USTED A PEDIDO*: ${getProduct.Nombre} 😎`);
       } catch (error) {
@@ -70,35 +69,37 @@ const flowCatalog = addKeyword(["1"], { sensitive: true })
     }
   );
 
-  const flowUbication = addKeyword("4", { sensitive: true })
-    .addAnswer(
-      "Visitanos! Esta es nuestra ubicación exacta! 👾⚡",
-      null,
-      async (ctx, { provider }) => {
-        const id = ctx.key.remoteJid;
-        const sock = await provider.getInstance();
-        // send a location!
-        const sentMsg = await sock.sendMessage(id, {
-          location: { degreesLatitude: 5.501274, degreesLongitude: -73.8527 },
-        });
-      }
-    )
-    .addAction(async (ctx, { provider }) => {
+const flowUbication = addKeyword("4", { sensitive: true })
+  .addAnswer(
+    "Visitanos! Esta es nuestra ubicación exacta! 👾⚡",
+    null,
+    async (ctx, { provider }) => {
       const id = ctx.key.remoteJid;
       const sock = await provider.getInstance();
+      // send a location!
+      const sentMsg = await sock.sendMessage(id, {
+        location: { degreesLatitude: 5.501274, degreesLongitude: -73.8527 },
+      });
+    }
+  )
+  .addAction(async (ctx, { provider }) => {
+    const id = ctx.key.remoteJid;
+    const sock = await provider.getInstance();
 
-      const sentMsg = await sock.sendMessage(id, { text: 'Nuestro Instagram! 🤩🤳🏻\nhttps://www.instagram.com/computerias_/' });
-    })
-    .addAnswer(
-      [
-        "Me encanto haberte ayudado!",
-        "Escribe cualquier palabra para volver a ver al menu principal! 🥳",
-      ],
-      { delay: 500 },
-      async (_, { endFlow }) => {
-        endFlow();
-      }
-    );
+    const sentMsg = await sock.sendMessage(id, {
+      text: "Nuestro Instagram! 🤩🤳🏻\nhttps://www.instagram.com/computerias_/",
+    });
+  })
+  .addAnswer(
+    [
+      "Me encanto haberte ayudado!",
+      "Escribe cualquier palabra para volver a ver al menu principal! 🥳",
+    ],
+    { delay: 500 },
+    async (_, { endFlow }) => {
+      endFlow();
+    }
+  );
 
 const flowCatalogGamer = addKeyword(["5"], { sensitive: true })
   .addAnswer("Te envío el catalago gamer! 🎮🕹")
@@ -160,44 +161,31 @@ const flowCatalogGamer = addKeyword(["5"], { sensitive: true })
       gotoFlow(flowCustomer);
     }
   );
-  
-  const flowSorteo = addKeyword("6", { sensitive: true })
-  .addAnswer(
-    [
-      "Encantado de mostrarte todos nuestros sorteos!",
-      "",
-      "Cual es tu numero de cliente? ✌🏻😎",
-    ],
-    {
-      capture: true,
-    },
-    async (ctx, { flowDynamic, fallBack }) => {
-      const targetCode = ctx.body;
-      try {
-        const getProduct = await googleSheet.showResult3(targetCode);
-        if (getProduct === null) {
-          return fallBack(
-            "Ay... ese codigo no esta en mi base de datos! vuelvelo a intentar nuevamente! 👨🏻‍💻"
-          );
-        }
-        flowDynamic(
-          `Tenemos el sorte: ${getProduct.nombre} con numero de cliente *${getProduct.NumeroCliente}* se encuentra en estado *${getProduct.proceso}* 🤓`
+
+const flowSorteo = addKeyword("6", { sensitive: true }).addAnswer(
+  ["Estoy revisando si hay sorteos...! 🤓"],
+  null,
+  async (_, { state, flowDynamic, endFlow, gotoFlow }) => {
+    try {
+      const getProduct = await googleSheet.showResultSorteo();
+      if (getProduct === null) {
+        return endFlow(
+          "(☞ﾟヮﾟ)☞ Ay! *no tenemos sorteos*! Escribe cualquier cosa para el menu principal!☜(ﾟヮﾟ☜)"
         );
-      } catch (error) {
-        console.log(error);
       }
+      flowDynamic(
+        `Tenemos el sorteo: *${getProduct.sorteo}* en donde habra(n) *${getProduct.Ganadores} GANADOR(ES)* 🤑\n*CONDICIONES DEL SORTEO*: ${getProduct.Condiciones}`
+      );
+      state.update({
+        sorteoLink: getProduct.Listado,
+        puesto: getProduct.Puestos,
+      });
+      return gotoFlow(flowCustomerSorteo);
+    } catch (error) {
+      console.log(error);
     }
-  )
-  .addAnswer(
-    [
-      "Me encanto haberte ayudado!",
-      "Escribe cualquier palabra para volver a ver al menu principal! 🥳",
-    ],
-    { delay: 500 },
-    async (_, { endFlow }) => {
-      endFlow();
-    }
-  );
+  }
+);
 
 const flowVcard = addKeyword("7", { sensitive: true })
   .addAnswer(
@@ -241,5 +229,5 @@ module.exports = {
   flowCatalogGamer,
   flowSorteo,
   flowVcard,
-  flowUbication
+  flowUbication,
 };

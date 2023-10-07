@@ -131,40 +131,57 @@ class GoogleSheetService {
     }
   }
 
-  async showResult3(targetCode) {
+  async showResultSorteo() {
     try {
-      await this.doc.loadInfo("A1:I200");
-      const sheet = this.doc.sheetsByIndex[SORTEOS];
+      await this.doc.loadInfo();
+      const sheet = this.doc.sheetsByIndex[5];
       await sheet.loadCells();
+      const rows = await sheet.getRows();
 
-      const rows = sheet.rowCount;
-      console.log("Número de filas:", rows);
+      const rowDataArray = rows
+        .filter((row) => row.get("Sorteo activo?") === "Si")
+        .map((row) => ({
+          respuesta: row.get("Sorteo activo?"),
+          sorteo: row.get("Que se sortea?"),
+          Link: row.get("Link imagen"),
+          Listado: row.get("Listado"),
+          '1 puesto': row.get("1 puesto"),
+          '2 puestos': row.get("2 puestos"),
+          Puestos: row.get("2 puestos"),
+          Ganadores: row.get("Total Ganadores"),
+          Condiciones: row.get("Condiciones"),
+        }));
 
-      for (let rowIndex = 1; rowIndex < rows; rowIndex++) {
-        const numberClientCell = sheet.getCell(rowIndex, 1);
-        console.log("Comparando:", numberClientCell.value, String(targetCode)); //Este es un console.log que me verifica si coinciden los #s
-        if (String(numberClientCell.value) === String(targetCode)) {
-          const item = {
-            puesto: sheet.getCell(rowIndex, 0).value,
-            nombre: numberClientCell.value,
-            estado: sheet.getCell(rowIndex, 2).value,
-            "Sorteo activo?": sheet.getCell(rowIndex, 3).value,
-            "Que se sortea?": sheet.getCell(rowIndex, 4).value,
-            puesto: sheet.getCell(rowIndex, 5).value,
-            precio: sheet.getCell(rowIndex, 6).value,
-          };
-          console.log("Item encontrado:", item);
-          return item;
-        }
-      }
+      const rowData = rowDataArray.length > 0 ? rowDataArray[0] : null;
 
-      console.log("Código no encontrado.");
-      return null;
+      return rowData;
     } catch (err) {
       console.log(err);
       return undefined;
     }
   }
+  async showResultRifa(targetCode) {
+    try {
+      await this.doc.loadInfo();
+      const sheet = this.doc.sheetsByIndex[6];
+      await sheet.loadCells();
+      const rows = await sheet.getRows();
+
+      const rowDataArray = rows
+        .filter((row) => row.get("Numero de rifa") === targetCode)
+        .map((row) => ({
+          nombre: row.get("Numero de rifa"),
+        }));
+
+      const rowData = rowDataArray.length > 0 ? rowDataArray[0] : null;
+
+      return rowData;
+    } catch (err) {
+      console.log(err);
+      return undefined;
+    }
+  }
+
 
   // Guardar pedido
   async saveOrder(data) {
@@ -186,6 +203,26 @@ class GoogleSheetService {
         Numero: data.clientNumber,
         Observaciones: data.observation,
         Estatus: data.status,
+      });
+      return order;
+    } catch (error) {
+      throw error;
+    }
+  }
+  async saveOrderRifa(data) {
+    await this.doc.loadInfo();
+    const sheet = this.doc.sheetsByIndex[6];
+    console.log(sheet.title);
+    try {
+      const order = await sheet.addRow({
+        Dia: data.date,
+        Hora: data.hour,
+        Nombre: data.name,
+        Apellido: data.lastname,
+        Telefono:data.telefono,
+        'Numero de rifa': data.numeroRifa,
+        Estado: data.estado
+
       });
       return order;
     } catch (error) {

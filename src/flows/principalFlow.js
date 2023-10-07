@@ -1,9 +1,13 @@
 const { addKeyword, EVENTS } = require("@bot-whatsapp/bot");
 
-const { flowCatalog, flowVcard, flowCatalogGamer, flowUbication } = require('./answerFlow');
-const {  flowPrint3D, flowPrint3DCustom } = require('./answer3DFlow');
-
-
+const {
+  flowCatalog,
+  flowVcard,
+  flowCatalogGamer,
+  flowUbication,
+  flowSorteo,
+} = require("./answerFlow");
+const { flowPrint3D, flowPrint3DCustom } = require("./answer3DFlow");
 
 const flowWelcome = addKeyword(EVENTS.WELCOME)
   .addAnswer([
@@ -29,21 +33,31 @@ const flowWelcome = addKeyword(EVENTS.WELCOME)
     { capture: true, delay: 400 },
 
     async (ctx, { fallBack }) => {
-      console.log('La informacion del cliente', ctx)
+      console.log("La informacion del cliente", ctx);
       const clientAnswer = ctx.body;
-      if (!["1", "2", "3", "4", "5", "6", "7"].includes(clientAnswer) ) {
-        return fallBack("Whoops! no me has dado un numero que pertenezca a la lista! 😫");
-      } 
-    }, 
-    [flowCatalog, flowPrint3D, flowVcard, flowCatalogGamer, flowPrint3DCustom, flowUbication]
+      if (!["1", "2", "3", "4", "5", "6", "7"].includes(clientAnswer)) {
+        return fallBack(
+          "Whoops! no me has dado un numero que pertenezca a la lista! 😫"
+        );
+      }
+    },
+    [
+      flowCatalog,
+      flowPrint3D,
+      flowVcard,
+      flowCatalogGamer,
+      flowPrint3DCustom,
+      flowUbication,
+      flowSorteo,
+    ]
   );
 
-  const flowCancel = addKeyword("CANCELAR", { sensitive: true }).addAnswer(
-    "TODO QUEDO CANCELADO! ESCRIBE CUALQUIER COSA PARA VOLVER AL MENU PRINCIPAL! 🙉🙉",
-    null,
-    async (_, endFlow) => {
-      endFlow()
-    }
-  );
+const flowCancel = addKeyword("CANCELAR", { sensitive: true }).addAnswer(
+  "TODO QUEDO CANCELADO! ESCRIBE CUALQUIER COSA PARA VOLVER AL MENU PRINCIPAL! 🙉🙉",
+  null,
+  async (_, endFlow) => {
+    endFlow();
+  }
+);
 
-  module.exports = { flowWelcome, flowCancel };
+module.exports = { flowWelcome, flowCancel };
