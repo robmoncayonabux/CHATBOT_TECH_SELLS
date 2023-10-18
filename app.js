@@ -5,7 +5,7 @@ const QRPortalWeb = require("@bot-whatsapp/portal");
 const MockAdapter = require("@bot-whatsapp/database/mock");
 
 const { flowWelcome, flowCancel } = require("./src/flows/principalFlow");
-const { flowCustomer,  AnotherSell, flowCustomerSorteo } = require("./src/flows/customerFlow");
+const { flowCustomer,  AnotherSell, flowCustomerSorteo, AnotherSellRifa } = require("./src/flows/customerFlow");
 const { flowCustomer3D, Another3DSell, flowCustomer3DCUSTOM } = require("./src/flows/customer3DFlow");
 const { flowPrint3Dopt1 } = require("./src/flows/answer3DFlow");
 
@@ -20,7 +20,8 @@ const main = async () => {
     Another3DSell,
     flowPrint3Dopt1,
     flowCustomerSorteo,
-    flowCustomer3DCUSTOM
+    AnotherSellRifa,
+    flowCustomer3DCUSTOM,
   ]);
   const adapterProvider = createProvider(BaileysProvider);
 

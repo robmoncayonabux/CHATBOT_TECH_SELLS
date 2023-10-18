@@ -2,16 +2,13 @@ const { addKeyword, EVENTS } = require("@bot-whatsapp/bot");
 
 const GoogleSheetService = require("../services/sheet");
 
-const {flowCustomer3D, flowCustomer3DCUSTOM} = require ("./customer3DFlow")
-
+const { flowCustomer3D, flowCustomer3DCUSTOM } = require("./customer3DFlow");
 
 const googleSheet = new GoogleSheetService(
   "16-36L83cctMUzjJ8IJh1INEEstmRNKqbpG5_aJhQFs8"
 );
 
-
-const flowPrint3D = addKeyword("2", { sensitive: true })
-
+const flowPrint3D = addKeyword("3", { sensitive: true })
   .addAnswer(
     [
       "Encantado de atenderte en la opcion de impresiones 3D!",
@@ -38,42 +35,52 @@ const flowPrint3D = addKeyword("2", { sensitive: true })
       }
     }
   )
-  .addAction({ capture: true }, async (ctx, { flowDynamic, fallBack }) => {
-    try {
-      const targetCode = ctx.body;
-      const getProduct = await googleSheet.showResultPrint3D(targetCode);
-      if (getProduct === null) {
-        return fallBack(
-          "Ay... ese codigo no esta en mi base de datos! vuelvelo a intentar nuevamente! 👨🏻‍💻"
+  .addAction(
+    { capture: true },
+    async (ctx, { flowDynamic, fallBack, endFlow }) => {
+      try {
+        const targetCode = ctx.body;
+        if (targetCode === "CANCELAR") {
+          return endFlow({
+            body: "❌ Su solicitud ha sido cancelada, escribe cualquier palabra para regresar al MENU PRINCIPAL ❌",
+          });
+        }
+        const getProduct = await googleSheet.showResultPrint3D(targetCode);
+        if (getProduct === null) {
+          return fallBack(
+            "Ay... ese codigo no esta en mi base de datos! vuelvelo a intentar nuevamente! 👨🏻‍💻"
+          );
+        }
+        flowDynamic(
+          `Su pedido con numero de cliente *${getProduct.pedido}* se encuentra en estado *${getProduct.proceso}* 🤓.\nEscribe cualquier cosa para el menu principal!`
         );
+      } catch (error) {
+        console.log(error);
       }
-      flowDynamic(
-        `Su pedido con numero de cliente *${getProduct.pedido}* se encuentra en estado *${getProduct.proceso}* 🤓.\nEscribe cualquier cosa para el menu principal!`
-      );
+    }
+  );
+
+const flowPrint3Dopt1 = addKeyword(EVENTS.ACTION)
+  .addAnswer("Te envío el catalogo de nuestros pedidos mas solicitados")
+  .addAction(async (_, { flowDynamic }) => {
+    try {
+      const getProduct = await googleSheet.GiveList3D();
+      return flowDynamic(`Lista de items:\n${getProduct.Mensaje} `);
     } catch (error) {
       console.log(error);
     }
-  });
-
-  const flowPrint3Dopt1 = addKeyword(EVENTS.ACTION)
-  .addAnswer("Te envío el catalogo de nuestros pedidos mas solicitados")
-  .addAnswer(
-    "Abre el catalogo e indicame que ITEM deseas! *_Cargando Archivo_* 🤖"
-  )
-  .addAnswer(
-    "Hey, aqui el catalago!",
-    {
-      media:
-        "https://web.seducoahuila.gob.mx/biblioweb/upload/el%20principito.pdf",
-    },
-    null
-  )
+  })
   .addAnswer(
     ["Escribeme el *ITEM* del producto que deseas, espero tu respuesta! 🤖"],
     { capture: true },
-    async (ctx, { state, fallBack, flowDynamic }) => {
+    async (ctx, { state, fallBack, flowDynamic, endFlow }) => {
       const targetCode = ctx.body;
       try {
+        if (targetCode === "CANCELAR") {
+          return endFlow({
+            body: "❌ Su solicitud ha sido cancelada, escribe cualquier palabra para regresar al MENU PRINCIPAL ❌",
+          });
+        }
         const getProduct = await googleSheet.showResultList3D(targetCode);
         if (getProduct === null) {
           fallBack(
@@ -93,7 +100,7 @@ const flowPrint3D = addKeyword("2", { sensitive: true })
   .addAnswer(
     "Cuantos deseas? 🔢",
     { capture: true },
-    async (ctx, { state, flowDynamic, fallBack }) => {
+    async (ctx, { state, flowDynamic, fallBack, gotoFlow }) => {
       const numberValue = parseFloat(ctx.body);
 
       if (!isNaN(numberValue) && Number.isInteger(numberValue)) {
@@ -102,20 +109,17 @@ const flowPrint3D = addKeyword("2", { sensitive: true })
         flowDynamic(
           `*USTED A PEDIDO*: ${currentState.productname}\n*CANTIDAD*: ${currentState.productAmount} 🤯`
         );
+        flowDynamic(
+          "Excelente elección! comencemos con la solicitud de compra!"
+        );
+        gotoFlow(flowCustomer3D);
       } else {
         fallBack("Ayy... eso no es un numero! Vuelvelo a intentar! 🔢😥");
       }
     }
-  )
-  .addAnswer(
-    "Excelente elección! comencemos con la solicitud de compra!",
-    { delay: 200 },
-    async (_, { gotoFlow }) => {
-      gotoFlow(flowCustomer3D);
-    }
   );
 
-const flowPrint3DCustom = addKeyword("3", { sensitive: true })
+const flowPrint3DCustom = addKeyword("2", { sensitive: true })
   .addAnswer(
     [
       "Encantado de atenderte en la opcion de impresiones 3D!",
@@ -142,26 +146,33 @@ const flowPrint3DCustom = addKeyword("3", { sensitive: true })
       }
     }
   )
-  .addAction({ capture: true }, async (ctx, { flowDynamic, fallBack, endFlow }) => {
-    try {
-      const targetCode = ctx.body;
-      const getProduct = await googleSheet.showResultPrint3D(targetCode);
-      if (getProduct === null) {
-        return fallBack(
-          "Ay... ese codigo no esta en mi base de datos! vuelvelo a intentar nuevamente! 👨🏻‍💻"
+  .addAction(
+    { capture: true },
+    async (ctx, { flowDynamic, fallBack, endFlow }) => {
+      try {
+        const targetCode = ctx.body;
+        if (targetCode === "CANCELAR") {
+          return endFlow({
+            body: "❌ Su solicitud ha sido cancelada, escribe cualquier palabra para regresar al MENU PRINCIPAL ❌",
+          });
+        }
+        const getProduct = await googleSheet.showResultPrint3D(targetCode);
+        if (getProduct === null) {
+          return fallBack(
+            "Ay... ese codigo no esta en mi base de datos! vuelvelo a intentar nuevamente! 👨🏻‍💻"
+          );
+        }
+        flowDynamic(
+          `Su pedido con numero de cliente *${getProduct.pedido}* se encuentra en estado *${getProduct.proceso}* 🤓.\nEscribe cualquier cosa para el menu principal!`
         );
+      } catch (error) {
+        console.log(error);
       }
-      flowDynamic(
-        `Su pedido con numero de cliente *${getProduct.pedido}* se encuentra en estado *${getProduct.proceso}* 🤓.\nEscribe cualquier cosa para el menu principal!`
-      );
-    } catch (error) {
-      console.log(error);
     }
-  });
+  );
 
-
-  module.exports = {
-    flowPrint3D,
-    flowPrint3DCustom,
-    flowPrint3Dopt1,
-  }
+module.exports = {
+  flowPrint3D,
+  flowPrint3DCustom,
+  flowPrint3Dopt1,
+};

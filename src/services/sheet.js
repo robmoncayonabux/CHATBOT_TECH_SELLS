@@ -90,6 +90,7 @@ class GoogleSheetService {
         .map((row) => ({
           item: row.get("Item"),
           Nombre: row.get("Nombre"),
+          Mensaje: row.get("Mensaje")
         }));
 
       const rowData = rowDataArray.length > 0 ? rowDataArray[0] : null;
@@ -100,6 +101,28 @@ class GoogleSheetService {
       return undefined;
     }
   }
+  async GiveList3D() {
+    try {
+      await this.doc.loadInfo();
+      const sheet = this.doc.sheetsByIndex[3];
+      await sheet.loadCells();
+      const rows = await sheet.getRows();
+  
+      const rowDataArray = rows
+        .filter((row) => row.get("Item") !== null)
+        .map((row) => ({
+          item: row.get("Item"),
+          Nombre: row.get("Nombre"),
+          Mensaje: row.get("Mensaje")
+        }));
+  
+      return rowDataArray.length > 0 ? rowDataArray[0] : null;
+    } catch (err) {
+      console.log(err);
+      return undefined;
+    }
+  }
+  
 
   async showResultPrint3D(targetCode) {
     try {
@@ -147,7 +170,7 @@ class GoogleSheetService {
           Listado: row.get("Listado"),
           '1 puesto': row.get("1 puesto"),
           '2 puestos': row.get("2 puestos"),
-          Puestos: row.get("2 puestos"),
+          Puestos: row.get("Puestos"),
           Ganadores: row.get("Total Ganadores"),
           Condiciones: row.get("Condiciones"),
         }));
@@ -187,7 +210,6 @@ class GoogleSheetService {
   async saveOrder(data) {
     await this.doc.loadInfo();
     const sheet = this.doc.sheetsByIndex[2];
-    console.log(sheet.title);
     try {
       const order = await sheet.addRow({
         Fecha: data.date,
@@ -202,7 +224,7 @@ class GoogleSheetService {
         Ciudad: data.city,
         Numero: data.clientNumber,
         Observaciones: data.observation,
-        Estatus: data.status,
+        Estatus: data.Status,
       });
       return order;
     } catch (error) {
@@ -212,7 +234,6 @@ class GoogleSheetService {
   async saveOrderRifa(data) {
     await this.doc.loadInfo();
     const sheet = this.doc.sheetsByIndex[6];
-    console.log(sheet.title);
     try {
       const order = await sheet.addRow({
         Dia: data.date,
@@ -234,7 +255,6 @@ class GoogleSheetService {
   async saveOrderPrint3D(data) {
     await this.doc.loadInfo();
     const sheet = this.doc.sheetsByIndex[4];
-    console.log(sheet.title);
     try {
       const order = await sheet.addRow({
         Fecha: data.date,

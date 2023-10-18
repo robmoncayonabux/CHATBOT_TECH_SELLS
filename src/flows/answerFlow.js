@@ -1,5 +1,12 @@
 const { addKeyword, EVENTS } = require("@bot-whatsapp/bot");
 
+const fs = require('fs');
+const path = require('path');
+
+const pdfPathGamer = path.resolve(__dirname, '../../assets/catalogogamer.pdf');
+const pdfPathCatalog = path.resolve(__dirname, '../../assets/catalogo1.pdf');
+
+
 const GoogleSheetService = require("../services/sheet");
 
 const { flowCustomer, flowCustomerSorteo } = require("./customerFlow");
@@ -14,19 +21,23 @@ const flowCatalog = addKeyword(["1"], { sensitive: true })
     "Abre el catalogo e indicame que producto deseas! *_Cargando Archivo_* 🤖"
   )
   .addAnswer(
-    "Hey, aqui el catalago!",
+    "Aqui el catalogo",
     {
-      media:
-        "https://web.seducoahuila.gob.mx/biblioweb/upload/el%20principito.pdf",
+      media: pdfPathCatalog
     },
     null
   )
   .addAnswer(
     ["Escribeme el *codigo* del producto que deseas, espero tu respuesta! 🤖"],
     { capture: true },
-    async (ctx, { state, fallBack, flowDynamic }) => {
+    async (ctx, { state, fallBack, flowDynamic, endFlow }) => {
       const targetCode = ctx.body;
       try {
+        if (targetCode === "CANCELAR") {
+          return endFlow({
+            body: "❌ Su solicitud ha sido cancelada, escribe cualquier palabra para regresar al MENU PRINCIPAL ❌",
+          });
+        }
         const getProduct = await googleSheet.showResultCatalog(targetCode);
         if (getProduct === null) {
           fallBack(
@@ -107,19 +118,23 @@ const flowCatalogGamer = addKeyword(["5"], { sensitive: true })
     "Abre el catalago gamer e indicame que producto deseas! *_Cargando Archivo_* 🤖"
   )
   .addAnswer(
-    "Hey, aqui el catalago gamer! 🎮🕹",
+    "Aqui el catalogo",
     {
-      media:
-        "https://web.seducoahuila.gob.mx/biblioweb/upload/el%20principito.pdf",
+      media: pdfPathGamer
     },
     null
   )
   .addAnswer(
     ["Escribeme el *codigo* del producto que deseas, espero tu respuesta! 🤖🕹"],
     { capture: true },
-    async (ctx, { state, fallBack, flowDynamic }) => {
+    async (ctx, { state, fallBack, flowDynamic, endFlow }) => {
       const targetCode = ctx.body;
       try {
+        if (targetCode === "CANCELAR") {
+          return endFlow({
+            body: "❌ Su solicitud ha sido cancelada, escribe cualquier palabra para regresar al MENU PRINCIPAL ❌",
+          });
+        }
         const getProduct = await googleSheet.showResultCatalogGamer(targetCode);
         if (getProduct === null) {
           fallBack(
@@ -174,7 +189,7 @@ const flowSorteo = addKeyword("6", { sensitive: true }).addAnswer(
         );
       }
       flowDynamic(
-        `Tenemos el sorteo: *${getProduct.sorteo}* en donde habra(n) *${getProduct.Ganadores} GANADOR(ES)* 🤑\n*CONDICIONES DEL SORTEO*: ${getProduct.Condiciones}`
+        `Tenemos el sorteo: *${getProduct.sorteo}* en donde habra(n) *${getProduct.Ganadores} GANADOR(ES)* 🤑 *PUESTOS DISPONIBLES*: ${getProduct.Puestos}\n*CONDICIONES DEL SORTEO*: ${getProduct.Condiciones}`
       );
       state.update({
         sorteoLink: getProduct.Listado,

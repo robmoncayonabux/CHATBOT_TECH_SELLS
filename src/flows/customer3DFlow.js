@@ -1,5 +1,3 @@
-const { getDay } = require("date-fns");
-
 const { addKeyword, EVENTS } = require("@bot-whatsapp/bot");
 
 const GoogleSheetService = require("../services/sheet");
@@ -9,14 +7,13 @@ const googleSheet = new GoogleSheetService(
   "16-36L83cctMUzjJ8IJh1INEEstmRNKqbpG5_aJhQFs8"
 );
 
-const flowCustomer3D = addKeyword(EVENTS.ACTION, { delay: 600 })
-  .addAnswer([
-    "Empecemos con tu solicitud!\nAhora necesitare tu información! ✌🏻😎",
-  ])
+const flowCustomer3D = addKeyword(EVENTS.ACTION)
+  .addAnswer("Empecemos con tu solicitud!\nAhora necesitare tu información! ✌🏻😎")
   .addAnswer(
     "¿Cuál es tu nombre?",
     { capture: true },
     async (ctx, { state }) => {
+      console.log('ingrese al flow')
       try {
         state.update({ name: ctx.body });
       } catch (err) {
@@ -92,7 +89,7 @@ const flowCustomer3D = addKeyword(EVENTS.ACTION, { delay: 600 })
     }
   );
 
-  const flowCustomer3DCUSTOM = addKeyword(EVENTS.ACTION, { delay: 600 })
+const flowCustomer3DCUSTOM = addKeyword(EVENTS.ACTION, { delay: 600 })
   .addAnswer([
     "Empecemos con tu solicitud!\nAhora necesitare tu información! ✌🏻😎",
   ])
@@ -129,21 +126,15 @@ const flowCustomer3D = addKeyword(EVENTS.ACTION, { delay: 600 })
     }
   )
   .addAnswer(
-    "Estamos guardando los detalles de tu pedido... por favor espera ⌛",
+    "Perfecto ya llenamos tu solicitud \n Su codigo de pedido es:",
     null,
-    async (ctx, { state }) => {
+    async (ctx, { state, flowDynamic, endFlow }) => {
       const customerCode = generateCustomerCode();
       state.update({
         status: "En Proceso",
         clientNumber: ctx.from,
         customerCode: customerCode,
-      });
-    }
-  )
-  .addAnswer(
-    "Perfecto ya llenamos tu solicitud \n Su codigo de pedido es:",
-    null,
-    async (_, { state, flowDynamic }) => {
+      })
       const currentState = state.getMyState();
       flowDynamic(`${currentState.customerCode}`);
       await googleSheet.saveOrderPrint3D({
@@ -157,49 +148,52 @@ const flowCustomer3D = addKeyword(EVENTS.ACTION, { delay: 600 })
         description: currentState.description,
         status: currentState.status,
       });
+      flowDynamic("Te regreso al MENU PRINCIPAL! 😎");
+      return endFlow();
+    }
+  );
+
+const Another3DSell = addKeyword(EVENTS.ACTION)
+  .addAnswer(
+    ["Escribeme el *codigo* del producto que deseas, espero tu respuesta! 🤖"],
+    { capture: true },
+    async (ctx, { state, fallBack, flowDynamic }) => {
+      const targetCode = ctx.body;
+      try {
+        const getProduct = await googleSheet.showResultList3D(targetCode);
+        if (getProduct === null) {
+          fallBack(
+            "Ay... ese codigo no esta en mi base de datos! vuelvelo a intentar nuevamente! 👨🏻‍💻"
+          );
+        }
+        state.update({
+          productCode: getProduct.item,
+          productname: getProduct.Nombre,
+        });
+        flowDynamic(`*USTED A PEDIDO*: ${getProduct.Nombre} 😎`);
+      } catch (error) {
+        console.log(error);
+      }
     }
   )
+  .addAnswer(
+    "Cuantos deseas? 🔢",
+    { capture: true },
+    async (ctx, { state, flowDynamic, fallBack }) => {
+      const numberValue = parseFloat(ctx.body);
 
-  const Another3DSell = addKeyword(EVENTS.ACTION)
-.addAnswer(
-  ["Escribeme el *codigo* del producto que deseas, espero tu respuesta! 🤖"],
-  { capture: true },
-  async (ctx, { state, fallBack, flowDynamic }) => {
-    const targetCode = ctx.body;
-    try {
-      const getProduct = await googleSheet.showResultCatalog(targetCode);
-      state.update({
-        productCode: getProduct.Codigo,
-        productname: getProduct.Nombre,
-      });
-      flowDynamic(`*USTED A PEDIDO*: ${getProduct.Nombre} 😎`);
-      if (getProduct === null) {
-        fallBack(
-          "Ay... ese codigo no esta en mi base de datos! vuelvelo a intentar nuevamente! 👨🏻‍💻"
+      if (!isNaN(numberValue) && isFinite(numberValue)) {
+        state.update({ productAmount: ctx.body });
+        const currentStateUpdate = state.getMyState();
+        console.log("este es el currentstate update", currentStateUpdate)
+        flowDynamic(
+          `*USTED A PEDIDO*: ${currentStateUpdate.productname}\n*CANTIDAD*: ${currentStateUpdate.productAmount} 🤯`
         );
+      } else {
+        fallBack("Ayy... eso no es un numero! Vuelvelo a intentar! 🔢😥");
       }
-    } catch (error) {
-      console.log(error);
     }
-  }
-)
-.addAnswer(
-  "Cuantos deseas? 🔢",
-  { capture: true },
-  async (ctx, { state, flowDynamic, fallBack }) => {
-    const numberValue = parseFloat(ctx.body);
-
-    if (!isNaN(numberValue) && isFinite(ctx.body)) {
-      state.update({ productAmount: ctx.body });
-      const currentState = state.getMyState();
-      flowDynamic(
-        `*USTED A PEDIDO*: ${currentState.productname}\n*CANTIDAD*: ${currentState.productAmount} 🤯`
-      );
-    } else {
-      fallBack("Ayy... eso no es un numero! Vuelvelo a intentar! 🔢😥");
-    }
-  }
-)
+  )
   .addAnswer(
     [`Perfecto ya llenamos tu solicitud\nSu codigo de pedido es *el mismo*:`],
     null,
@@ -208,19 +202,15 @@ const flowCustomer3D = addKeyword(EVENTS.ACTION, { delay: 600 })
       console.log("Este es mi currentState", currentState);
       flowDynamic(`${currentState.customerCode}`);
       try {
-        await googleSheet.saveOrder({
+        await googleSheet.saveOrderPrint3D({
           date: new Date().toDateString(),
           customerCode: currentState.customerCode,
-          productCode: currentState.productCode,
-          price: currentState.productPrice,
-          delivery: currentState.delivery,
-          amount: currentState.productAmount,
           name: currentState.name,
           lastname: currentState.lastname,
-          direction: currentState.direction,
-          city: currentState.city,
           clientNumber: currentState.clientNumber,
-          observation: currentState.observation,
+          productAmount: currentState.productAmount,
+          namePrint: currentState.productname,
+          description: currentState.description,
           status: currentState.status,
         });
       } catch (error) {
@@ -249,8 +239,8 @@ const flowCustomer3D = addKeyword(EVENTS.ACTION, { delay: 600 })
     }
   );
 
-  module.exports = {
-    flowCustomer3D,
-    Another3DSell,
-    flowCustomer3DCUSTOM
-  }
+module.exports = {
+  flowCustomer3D,
+  Another3DSell,
+  flowCustomer3DCUSTOM
+}
